@@ -457,52 +457,59 @@
     .tlinks {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 24px;
       padding-bottom: 20px;
       border-bottom: 1px solid var(--bdr);
     }
 
     .tlinks label {
       grid-column: 1 / -1;
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--pl);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 4px;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      text-align: center;
     }
 
     .tlink {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--bdr);
-      color: var(--txt);
-      padding: 12px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      gap: 8px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1.5px solid rgba(99, 102, 241, 0.2);
+      color: #fff;
+      padding: 14px 10px;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
       text-decoration: none;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .tlink span {
-      font-size: 1.2rem;
+      font-size: 1.5rem;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     }
 
     .tlink:hover {
-      background: rgba(99, 102, 241, 0.15);
-      border-color: var(--primary);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      background: var(--primary);
+      border-color: var(--pl);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.35);
     }
 
-    .tlink.dtdc:hover { border-color: #facc15; color: #facc15; }
-    .tlink.trackon:hover { border-color: #ef4444; color: #ef4444; }
-    .tlink.delhivery:hover { border-color: #22d3ee; color: #22d3ee; }
+    .tlink.dtdc { border-color: rgba(250, 204, 21, 0.4); background: rgba(250, 204, 21, 0.1); }
+    .tlink.trackon { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); }
+    .tlink.delhivery { border-color: rgba(34, 211, 238, 0.4); background: rgba(34, 211, 238, 0.1); }
+
+    .tlink.dtdc:hover { background: #eab308; color: #000; border-color: #fef08a; }
+    .tlink.trackon:hover { background: #ef4444; color: #fff; border-color: #fca5a5; }
+    .tlink.delhivery:hover { background: #06b6d4; color: #fff; border-color: #67e8f9; }
   </style>
 </head>
 
