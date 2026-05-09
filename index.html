@@ -510,10 +510,144 @@
     .tlink.dtdc:hover { background: #eab308; color: #000; border-color: #fef08a; }
     .tlink.trackon:hover { background: #ef4444; color: #fff; border-color: #fca5a5; }
     .tlink.delhivery:hover { background: #06b6d4; color: #fff; border-color: #67e8f9; }
+
+    /* Help Popup */
+    .hbtn {
+      position: fixed;
+      bottom: 25px;
+      left: 25px;
+      width: 45px;
+      height: 45px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+      z-index: 9999;
+      transition: all 0.3s;
+    }
+
+    .hbtn:hover {
+      transform: scale(1.1) rotate(15deg);
+      background: var(--pl);
+    }
+
+    #hmod {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10001;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #hmod.open { display: flex; }
+
+    .hc {
+      background: var(--card);
+      border: 1px solid var(--bdr);
+      border-radius: 24px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      position: relative;
+      animation: pop .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes pop {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .hc h2 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #fff, var(--pl));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gi {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+
+    .gi .icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    .gi div b {
+      display: block;
+      color: var(--pl);
+      margin-bottom: 3px;
+    }
+
+    .gi div p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .close-h {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background .2s;
+    }
+
+    .close-h:hover { background: rgba(255, 255, 255, 0.2); }
   </style>
 </head>
 
 <body>
+  <button class="hbtn" onclick="openHelp()" title="Tracking Guide">?</button>
+
+  <div id="hmod">
+    <div class="hc">
+      <h2>💡 Tracking Guide</h2>
+      <div class="gi">
+        <span class="icon">🚛</span>
+        <div>
+          <b>DTDC Courier</b>
+          <p>Tracking numbers for DTDC usually start with the letter <strong>'D'</strong>.</p>
+        </div>
+      </div>
+      <div class="gi">
+        <span class="icon">🚚</span>
+        <div>
+          <b>Trackon Courier</b>
+          <p>The company name is clearly mentioned on the label in the photo.</p>
+        </div>
+      </div>
+      <div class="gi">
+        <span class="icon">📦</span>
+        <div>
+          <b>Delhivery Courier</b>
+          <p>Tracking numbers for Delhivery usually start with <strong>'356'</strong>.</p>
+        </div>
+      </div>
+      <button class="close-h" onclick="closeHelp()">Got it!</button>
+    </div>
+  </div>
+
   <div class="ph">
     <h1>🔎 Search Tracking Photos</h1>
     <p>Please enter your phone number to find your tracking photo.</p>
@@ -662,7 +796,12 @@
     }
     function closeMod() { document.getElementById('imod').classList.remove('open'); document.getElementById('mimg').src = ''; }
     document.getElementById('imod').addEventListener('click', e => { if (e.target === document.getElementById('imod')) closeMod(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMod(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeMod(); closeHelp(); } });
+
+    // Help functions
+    function openHelp() { document.getElementById('hmod').classList.add('open'); }
+    function closeHelp() { document.getElementById('hmod').classList.remove('open'); }
+    document.getElementById('hmod').addEventListener('click', e => { if (e.target === document.getElementById('hmod')) closeHelp(); });
 
     // Init
     loadAndSearch();
