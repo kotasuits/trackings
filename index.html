@@ -453,6 +453,47 @@
         width: 90vw;
       }
     }
+
+    .tlinks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--bdr);
+    }
+
+    .tlinks label {
+      width: 100%;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    .tlink {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--bdr);
+      color: var(--pl);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      flex: 1;
+      text-align: center;
+      min-width: 80px;
+    }
+
+    .tlink:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 
@@ -509,6 +550,12 @@
       <div class="mn" id="mname"></div>
       <div class="mm" id="mmeta"></div>
       <a id="mdl" class="dlbtn" download="tracking_photo.jpg">⬇️ Download Photo</a>
+      <div class="tlinks">
+        <label>Track your package on:</label>
+        <a href="https://www.dtdc.in/tracking.asp" target="_blank" class="tlink">DTDC</a>
+        <a href="https://trackon.in/" target="_blank" class="tlink">Trackon</a>
+        <a href="https://www.delhivery.com/" target="_blank" class="tlink">Delhivery</a>
+      </div>
     </div>
   </div>
 
