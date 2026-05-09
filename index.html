@@ -462,21 +462,7 @@
     <p>Find delivery photos by customer name, pincode, or phone number.</p>
   </div>
 
-  <!-- GitHub Config -->
-  <details style="margin-bottom:20px;cursor:pointer;" id="admin-cfg-panel">
-    <summary style="color:var(--muted);font-size:0.85rem;text-align:right;">Admin Settings</summary>
-    <div class="card" style="margin-top:10px;cursor:default;">
-      <div style="font-size:1rem;font-weight:600;color:var(--pl);margin-bottom:14px;">⚙️ GitHub Source</div>
-      <div class="cfg-row">
-        <div class="fld"><label>Repository (owner/repo)</label><input type="text" id="cfg-repo"
-            placeholder="yourname/tracking-photos"></div>
-        <div class="fld"><label>Branch</label><input type="text" id="cfg-branch" placeholder="main"></div>
-        <button class="btn btn-s" onclick="loadAndSearch()" style="white-space:nowrap;">🔄 Load Records</button>
-      </div>
-      <p style="margin-top:10px;font-size:.78rem;color:var(--muted);">If hosted on GitHub Pages, this configuration is
-        ignored and records load automatically.</p>
-    </div>
-  </details>
+
 
   <!-- Search -->
   <div class="card">
@@ -527,24 +513,8 @@
   </div>
 
   <script>
-    const CFGKEY = 'ghTrackCfg';
     let allRecords = [];
     let activeFilter = 'all';
-
-    // Config
-    function loadCfg() {
-      try {
-        const c = JSON.parse(localStorage.getItem(CFGKEY) || '{}');
-        if (c.repo) document.getElementById('cfg-repo').value = c.repo;
-        if (c.branch) document.getElementById('cfg-branch').value = c.branch;
-      } catch { }
-    }
-    function getCfg() {
-      const repo = document.getElementById('cfg-repo').value.trim();
-      const branch = document.getElementById('cfg-branch').value.trim() || 'main';
-      if (repo) localStorage.setItem(CFGKEY, JSON.stringify({ repo, branch }));
-      return { repo, branch };
-    }
 
     // State helpers
     function showState(id) {
@@ -558,44 +528,13 @@
     async function loadAndSearch() {
       showState('load-st');
       try {
-        let fetched = false;
-
-        // First, try relative fetch (for GitHub Pages hosting)
-        try {
-          let res = await fetch('records.json');
-          if (res.ok) {
-            allRecords = await res.json();
-            fetched = true;
-            // If relative fetch works, hide the config panel
-            document.getElementById('admin-cfg-panel').style.display = 'none';
-          }
-        } catch (err) {
-          console.warn("Relative fetch failed", err);
-        }
-
-        // Fallback to configured raw URL
-        if (!fetched) {
-          const { repo, branch } = getCfg();
-          if (!repo) throw new Error("No tracking repository configured.");
-
-          const rawUrl = `https://raw.githubusercontent.com/${repo}/${branch}/records.json`;
-          let res = await fetch(rawUrl);
-          if (res.ok) {
-            allRecords = await res.json();
-            fetched = true;
-          } else {
-            // Fallback to API if raw fetch fails
-            const apiUrl = `https://api.github.com/repos/${repo}/contents/records.json?ref=${branch}`;
-            const apiRes = await fetch(apiUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
-            if (!apiRes.ok) throw new Error('Tracking records not found. Ensure the repository is public.');
-            const d = await apiRes.json();
-            allRecords = JSON.parse(atob(d.content.replace(/\n/g, '')));
-          }
-        }
-
+        let res = await fetch('records.json');
+        if (!res.ok) throw new Error('Tracking records not found. Ensure records.json is in the same folder.');
+        allRecords = await res.json();
+        
         showState('init-st');
         const q = document.getElementById('si').value.trim();
-        if (q.length >= 4) doSearch(); else showState('init-st');
+        if (q.length >= 4) doSearch();
       } catch (e) {
         showState('norec-st');
         document.getElementById('norec-st').querySelector('p').textContent = e.message;
@@ -663,10 +602,7 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMod(); });
 
     // Init
-    loadCfg();
-    // Auto-load if config exists
-    const _c = JSON.parse(localStorage.getItem(CFGKEY) || '{}');
-    if (_c.repo) loadAndSearch();
+    loadAndSearch();
   </script>
 </body>
 
