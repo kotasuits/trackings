@@ -459,7 +459,7 @@
 <body>
   <div class="ph">
     <h1>🔎 Search Tracking Photos</h1>
-    <p>Find delivery photos by customer name, pincode, or phone number.</p>
+    <p>Please enter your phone number to find your tracking photo.</p>
   </div>
 
 
@@ -467,7 +467,7 @@
   <!-- Search -->
   <div class="card">
     <div class="sbox"><span class="si">🔍</span><input type="text" id="si"
-        placeholder="Enter your phone number or pincode to find your tracking photo..." autocomplete="off" autofocus
+        placeholder="Please enter phone number to find tracking..." autocomplete="off" autofocus
         oninput="doSearch()"></div>
   </div>
 
@@ -480,7 +480,7 @@
       <div class="sb" id="init-st">
         <div class="si2">🔎</div>
         <h3>Start searching</h3>
-        <p>Type a name, pincode, or phone number above.</p>
+        <p>Please enter your phone number above.</p>
       </div>
       <div class="sb" id="empty-st" style="display:none;">
         <div class="si2">😕</div>
@@ -490,11 +490,11 @@
       <div class="sb" id="norec-st" style="display:none;">
         <div class="si2">📭</div>
         <h3>No records loaded</h3>
-        <p>Click <strong>Load Records</strong> above first.</p>
+        <p>Unable to connect to the tracking database.</p>
       </div>
       <div class="sb" id="load-st" style="display:none;">
         <div class="si2">⏳</div>
-        <h3>Loading from GitHub…</h3>
+        <h3>Loading tracking data…</h3>
         <p>Please wait.</p>
       </div>
       <div id="rgrid"></div>
