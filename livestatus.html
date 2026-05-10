@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Tracking Status</title>
+    <title>Live Tracking - Track24</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script type="text/javascript" src="https://www.17track.net/externalcall.js"></script>
     <style>
         :root {
             --primary: #6366f1;
             --bg: #0a0f1e;
-            --card: rgba(20, 30, 55, .78);
+            --card: rgba(20, 30, 55, 0.9);
             --txt: #f1f5f9;
             --muted: #94a3b8;
-            --bdr: rgba(255, 255, 255, .09);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Outfit', sans-serif; 
+        }
         body {
             background: var(--bg);
-            background-image: radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, .15), transparent 50%);
+            background-image: radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, .15), transparent 60%);
             color: var(--txt);
             min-height: 100vh;
             padding: 20px;
@@ -26,17 +29,20 @@
             flex-direction: column;
             align-items: center;
         }
-        .container { width: 100%; max-width: 800px; margin-top: 20px; }
+        .container {
+            width: 100%;
+            max-width: 960px;
+            margin-top: 20px;
+        }
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 25px;
             width: 100%;
-            max-width: 800px;
         }
         .header h1 {
-            font-size: 1.5rem;
+            font-size: 1.65rem;
             background: linear-gradient(135deg, #818cf8, #22d3ee);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -44,116 +50,106 @@
         .back-btn {
             color: var(--muted);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             display: flex;
             align-items: center;
-            gap: 5px;
-            padding: 8px 15px;
-            border: 1px solid var(--bdr);
-            border-radius: 8px;
+            gap: 6px;
+            padding: 10px 18px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
             background: rgba(255,255,255,0.05);
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
         .back-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
+            background: rgba(255,255,255,0.15);
+            color: white;
         }
-        #YQContainer {
-            width: 100%;
-            min-height: 600px;
-            border-radius: 15px;
-            overflow: hidden;
-            background: white;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-        }
-
-        /* Attempt to hide ads / branding */
-        #YQContainer iframe,
-        #YQContainer [class*="ad"],
-        #YQContainer .advertisement,
-        #YQContainer .powered-by,
-        #YQContainer footer {
-            display: none !important;
-        }
-
         .info-card {
             background: var(--card);
-            border: 1px solid var(--bdr);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 25px;
             text-align: center;
         }
-        .info-card span { color: var(--primary); font-weight: 700; }
+        .info-card span { 
+            color: var(--primary); 
+            font-weight: 700; 
+            font-size: 1.2rem; 
+        }
+        #track24-frame {
+            width: 100%;
+            min-height: 700px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 25px 65px rgba(0,0,0,0.5);
+            border: none;
+        }
+        .loading {
+            padding: 140px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 1.15rem;
+        }
     </style>
 </head>
 <body>
+
     <div class="header">
         <a href="javascript:history.back()" class="back-btn">← Back to Search</a>
-        <h1>🚚 Live Tracking</h1>
-        <div style="width:100px;"></div>
+        <h1>🚚 Live Package Tracking</h1>
+        <div></div>
     </div>
 
     <div class="container">
         <div class="info-card">
-            Tracking Number: <span id="awb-display">Loading...</span><br>
-            <small id="carrier-info" style="color:#64748b;"></small>
+            Tracking Number: <span id="awb-display">-</span><br>
+            <small id="carrier-info" style="color:#64748b; margin-top:8px; display:block;"></small>
         </div>
-       
-        <div id="YQContainer">
-            <div style="padding:80px 20px; text-align:center; color:#666;">
-                ⌛ Initializing Tracking Service...
-            </div>
+        
+        <div id="loading" class="loading">
+            ⌛ Loading Tracking Information...
         </div>
+        
+        <iframe id="track24-frame" 
+                src="about:blank" 
+                frameborder="0" 
+                allowfullscreen>
+        </iframe>
     </div>
 
     <script>
+        // Get tracking number from URL (?awb=xxxxxxxx)
         const params = new URLSearchParams(window.location.search);
         const awb = params.get('awb')?.trim();
 
         if (!awb) {
-            document.querySelector('.info-card').innerHTML = "❌ No tracking number provided.";
-            document.getElementById('YQContainer').style.display = 'none';
+            document.querySelector('.info-card').innerHTML = 
+                `<strong style="color:#ef4444;">❌ No tracking number provided.<br><br>Use this format:<br>?awb=YOURTRACKINGNUMBER</strong>`;
+            document.getElementById('loading').style.display = 'none';
         } else {
+            // Display AWB
             document.getElementById('awb-display').textContent = awb;
 
-            let carrierCode = "0";
-            const upperAwb = awb.toUpperCase();
+            // Carrier hint for Indian users
+            const upper = awb.toUpperCase();
+            let carrier = "Multiple Couriers";
 
-            if (upperAwb.startsWith('D')) {
-                carrierCode = "100069"; // DTDC
-                document.getElementById('carrier-info').textContent = "Carrier: DTDC";
-            } else if (upperAwb.startsWith('5006')) {
-                carrierCode = "100180"; // Trackon
-                document.getElementById('carrier-info').textContent = "Carrier: Trackon";
-            } else if (upperAwb.startsWith('356') || upperAwb.startsWith('19')) {
-                carrierCode = "100060"; // Delhivery
-                document.getElementById('carrier-info').textContent = "Carrier: Delhivery";
-            } else {
-                document.getElementById('carrier-info').textContent = "Carrier: Auto Detection";
-            }
+            if (upper.startsWith('D')) carrier = "DTDC";
+            else if (upper.startsWith('5006')) carrier = "Trackon";
+            else if (upper.startsWith('356') || upper.startsWith('19')) carrier = "Delhivery";
+            else if (upper.startsWith('B')) carrier = "Bluedart";
 
-            function initTracking() {
-                if (typeof YQV5 !== 'undefined') {
-                    document.getElementById('YQContainer').innerHTML = '';
-                    
-                    YQV5.trackSingle({
-                        YQ_ContainerId: "YQContainer",
-                        YQ_Height: 620,
-                        YQ_Lang: "en",
-                        YQ_Num: awb,
-                        YQ_Fc: carrierCode
-                    });
-                } else {
-                    setTimeout(initTracking, 400);
-                }
-            }
+            document.getElementById('carrier-info').textContent = `Carrier: ${carrier}`;
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initTracking);
-            } else {
-                initTracking();
-            }
+            // Load Track24 Widget
+            const frame = document.getElementById('track24-frame');
+            frame.src = `https://track24.net/forms/widget/?num=${encodeURIComponent(awb)}`;
+
+            // Hide loading when widget loads
+            frame.onload = () => {
+                document.getElementById('loading').style.display = 'none';
+            };
         }
     </script>
 </body>
