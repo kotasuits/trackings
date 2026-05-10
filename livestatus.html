@@ -75,6 +75,11 @@
             text-align: center;
         }
         .info-card span { color: var(--primary); font-weight: 700; }
+        .carrier-info {
+            font-size: 0.9rem;
+            margin-top: 8px;
+            color: var(--muted);
+        }
     </style>
 </head>
 <body>
@@ -87,12 +92,12 @@
 
     <div class="container">
         <div class="info-card">
-            Tracking Number: <span id="awb-display">Loading...</span><br>
-            <small id="carrier-info" style="color:#64748b;"></small>
+            Tracking Number: <span id="awb-display">Loading...</span>
+            <div class="carrier-info" id="carrier-info"></div>
         </div>
         
         <div id="YQContainer">
-            <div style="padding:80px 20px; text-align:center; color:#666;">
+            <div style="padding:80px; text-align:center; color:#666;">
                 ⌛ Initializing Tracking Service...
             </div>
         </div>
@@ -108,36 +113,40 @@
         } else {
             document.getElementById('awb-display').textContent = awb;
 
-            // ================== Carrier Detection ==================
-            let carrierCode = "0"; // 0 = auto detect (default)
-            const upperAwb = awb.toUpperCase();
+            // Smart Carrier Detection for Indian Couriers
+            function getCarrierCode(trackingNum) {
+                const num = trackingNum.toUpperCase();
 
-            if (upperAwb.startsWith('D')) {
-                carrierCode = "100069";     // DTDC
-                document.getElementById('carrier-info').textContent = "Carrier: DTDC";
-            } 
-            else if (upperAwb.startsWith('5006')) {
-                carrierCode = "100180";     // Trackon
-                document.getElementById('carrier-info').textContent = "Carrier: Trackon";
-            } 
-            else if (upperAwb.startsWith('356') || upperAwb.startsWith('19')) {
-                carrierCode = "100060";     // Delhivery
-                document.getElementById('carrier-info').textContent = "Carrier: Delhivery";
-            } else {
-                document.getElementById('carrier-info').textContent = "Carrier: Auto Detection";
+                if (num.startsWith('D')) {
+                    document.getElementById('carrier-info').textContent = 'Carrier: DTDC';
+                    return "100069";        // DTDC
+                }
+                if (num.startsWith('5006')) {
+                    document.getElementById('carrier-info').textContent = 'Carrier: Trackon';
+                    return "100180";        // Trackon
+                }
+                if (num.startsWith('356') || num.startsWith('19')) {
+                    document.getElementById('carrier-info').textContent = 'Carrier: Delhivery';
+                    return "100060";        // Delhivery
+                }
+
+                // Default: Let 17Track auto-detect
+                document.getElementById('carrier-info').textContent = 'Carrier: Auto Detecting...';
+                return "0";
             }
 
-            // ================== Initialize 17Track ==================
             function initTracking() {
                 if (typeof YQV5 !== 'undefined') {
                     document.getElementById('YQContainer').innerHTML = '';
+
+                    const carrierCode = getCarrierCode(awb);
 
                     YQV5.trackSingle({
                         YQ_ContainerId: "YQContainer",
                         YQ_Height: 600,
                         YQ_Lang: "en",
                         YQ_Num: awb,
-                        YQ_Fc: carrierCode   // Specific carrier or 0 for auto
+                        YQ_Fc: carrierCode
                     });
                 } else {
                     setTimeout(initTracking, 400);
