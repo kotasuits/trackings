@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Search Tracking Photos</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <script type="text/javascript" src="//www.17track.net/externalcall.js"></script>
+  <script type="text/javascript" src="https://www.17track.net/externalcall.js"></script>
   <style>
     :root {
       --primary: #6366f1;
@@ -434,12 +434,22 @@
       </div>
       <div id="rgrid"></div>
     </div>
-  </div>
-
-  <!-- Modal -->
-  <div id="imod">
+  </div>  <div id="imod">
     <button class="cm" onclick="closeMod()">✕</button>
     <div class="mw"><img id="mimg" src="" alt=""></div>
+    
+    <!-- Tracking Input right below photo -->
+    <div class="track-input-box" style="padding: 15px 20px; border-bottom: 1px solid var(--bdr); background: rgba(255,255,255,0.03);">
+      <label style="display:block; font-size:.68rem; color:var(--pl); margin-bottom:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px;">🚚 Live Tracking (Enter AWB from photo)</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="manual-awb" placeholder="Type Tracking ID here..." style="flex:1; background:var(--inp); border:1px solid var(--bdr); border-radius:8px; padding:10px; color:#fff; outline:none; font-size:0.9rem;">
+        <button class="dlbtn" style="margin-top:0; padding:0 20px; background:var(--primary); font-size:0.85rem;" onclick="startManualTrack()">Track</button>
+      </div>
+      <div id="track-area" style="display:none; margin-top:15px; border-radius:10px; overflow:hidden; background:white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        <div id="YQContainer" style="width:100%; height:320px;"></div>
+      </div>
+    </div>
+
     <div class="mi">
       <div class="mn" id="mname"></div>
       <div class="mm" id="mmeta"></div>
@@ -449,17 +459,6 @@
         <a href="https://www.dtdc.in/tracking/shipment-tracking.asp" target="_blank" class="tlink dtdc"><span>🚛</span> DTDC</a>
         <a href="https://trackon.in/" target="_blank" class="tlink trackon"><span>🚚</span> Trackon</a>
         <a href="https://www.delhivery.com/tracking" target="_blank" class="tlink delhivery"><span>📦</span> Delhivery</a>
-      </div>
-      <div class="track-input-box" style="margin-top:20px; border-top:1px solid var(--bdr); padding-top:20px;">
-        <label style="display:block; font-size:.72rem; color:var(--muted); margin-bottom:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">👇 Enter Tracking ID (Look at the photo above)</label>
-        <div style="display:flex; gap:8px;">
-          <input type="text" id="manual-awb" placeholder="Type AWB / Tracking Number" style="flex:1; background:var(--inp); border:1px solid var(--bdr); border-radius:8px; padding:10px; color:#fff; outline:none; font-size:0.9rem;">
-          <button class="dlbtn" style="margin-top:0; padding:0 20px; background:var(--primary); font-size:0.85rem;" onclick="startManualTrack()">Track Now</button>
-        </div>
-      </div>
-
-      <div id="track-area" style="display:none; margin-top:15px; border-top:1px solid var(--bdr); padding-top:15px;">
-        <div id="YQContainer" style="width:100%; height:300px; border-radius:10px; overflow:hidden; background:white;"></div>
       </div>
 
       <a id="mdl" class="dlbtn" style="width:100%; justify-content:center; margin-top:15px;" download="tracking_photo.jpg">⬇️ Download Photo</a>
@@ -584,14 +583,25 @@
     function startManualTrack() {
       const num = document.getElementById('manual-awb').value.trim();
       if (!num) { alert("Please enter the tracking ID from the photo."); return; }
-      if (typeof YQ511 === 'undefined') { alert("Tracking service is still loading, please wait a second."); return; }
+      
+      if (typeof YQ511 === 'undefined') { 
+        toast("Tracking service is still loading, please wait a few seconds...", "in");
+        // Try to re-inject script if it failed
+        if (!document.getElementById('yq-script')) {
+          const s = document.createElement('script');
+          s.id = 'yq-script';
+          s.src = 'https://www.17track.net/externalcall.js';
+          document.head.appendChild(s);
+        }
+        return; 
+      }
       
       document.getElementById('track-area').style.display = 'block';
-      document.getElementById('YQContainer').innerHTML = '';
+      document.getElementById('YQContainer').innerHTML = '<div style="padding:20px;color:#000;text-align:center;">⌛ Loading Tracking Status...</div>';
       
       YQ511.trackSingle({
         YQ_ContainerId: "YQContainer",
-        YQ_Height: 300,
+        YQ_Height: 320,
         YQ_Lang: "en",
         YQ_Num: num
       });
