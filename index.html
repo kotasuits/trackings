@@ -443,18 +443,20 @@
       position: absolute;
       top: -30px;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) scale(0.5);
       background: var(--ok);
       color: #fff;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: .75rem;
-      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: .8rem;
+      font-weight: 800;
       opacity: 0;
-      transition: opacity .3s, top .3s;
+      transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      z-index: 20;
     }
-    .tbar.copied .t-toast { opacity: 1; top: -40px; }
+    .tbar.copied .t-toast { opacity: 1; top: -45px; transform: translateX(-50%) scale(1); }
 
     #scan-st {
       font-size: .8rem;
@@ -812,10 +814,13 @@
 
     function detectCourier(tn) {
         if (!tn) return '';
-        tn = tn.toUpperCase();
-        if (/^356\d{9}$/.test(tn) || /^\d{12}$/.test(tn)) return 'Delhivery';
-        if (/^[DWXUVB]\d{8,9}$/.test(tn)) return 'DTDC';
-        if (/^\d{9,10}$/.test(tn)) return 'Trackon';
+        tn = tn.trim().toUpperCase();
+        // Delhivery: 12-14 digits, starts with 19 or 356
+        if (/^(19|35)\d{10,12}$/.test(tn)) return 'Delhivery';
+        // DTDC: Starts with D, W, X, U, V, B followed by 9-11 digits
+        if (/^[DWXUVB]\d{9,11}$/.test(tn)) return 'DTDC';
+        // Trackon: 10-12 digits, often starts with 100
+        if (/^100\d{9}$/.test(tn) || /^\d{10,12}$/.test(tn)) return 'Trackon';
         return 'Courier';
     }
 
