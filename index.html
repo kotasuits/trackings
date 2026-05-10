@@ -22,6 +22,7 @@
     .sbox { position: relative; margin-bottom: 14px; }
     .sbox .si { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; }
     .sbox input { width: 100%; background: var(--inp); border: 1.5px solid var(--bdr); border-radius: 13px; padding: 14px 16px 14px 48px; color: var(--txt); font-size: 1rem; outline: none; }
+    .sbox input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, .2); }
     #rgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
     .rc { background: rgba(10, 15, 35, .72); border: 1px solid var(--bdr); border-radius: 15px; overflow: hidden; cursor: pointer; transition: transform .2s; }
     .rc:hover { transform: translateY(-4px); border-color: var(--pl); }
@@ -40,11 +41,23 @@
     .cfg-fld { display: flex; gap: 8px; }
     .cfg-fld input { flex: 1; background: var(--inp); border: 1px solid var(--bdr); border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 0.8rem; outline: none; }
     .cfg-fld button { background: var(--primary); border: none; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
+    .help-link { display: inline-block; font-size: 0.75rem; color: var(--pl); cursor: pointer; margin-bottom: 8px; text-decoration: underline; opacity: 0.8; transition: opacity 0.2s; }
+    .help-link:hover { opacity: 1; }
+    #hmod { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 10001; overflow-y: auto; padding: 40px 10px; flex-direction: column; align-items: center; }
+    #hmod.open { display: flex; }
+    .hc { margin-top: auto; margin-bottom: auto; background: var(--card); border: 1px solid var(--bdr); border-radius: 24px; padding: 30px; max-width: 400px; width: 100%; position: relative; }
+    .hc h2 { margin-bottom: 20px; font-size: 1.5rem; color: #fff; }
+    .gi { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 18px; }
+    .gi .icon { font-size: 1.6rem; }
+    .gi div b { display: block; color: var(--pl); margin-bottom: 3px; }
+    .gi div p { font-size: 0.9rem; color: var(--muted); line-height: 1.4; }
+    .close-h { background: rgba(255, 255, 255, 0.1); border: none; color: #fff; width: 100%; padding: 12px; border-radius: 12px; margin-top: 10px; cursor: pointer; font-weight: 600; }
   </style>
 </head>
 <body>
   <div class="ph"><h1>🔎 Search Tracking Photos</h1><p>Enter phone number to find your parcel photo.</p></div>
   <div class="card">
+    <div class="help-link" onclick="openHelp()">❓ Need help identifying courier?</div>
     <div class="sbox"><span class="si">🔍</span><input type="text" id="si" placeholder="Enter phone number..." oninput="doSearch()"></div>
     <div id="cfg-tip" class="cfg-tip" onclick="document.getElementById('cfg-box').style.display='block'">⚙️ Repository Settings</div>
     <div id="cfg-box">
@@ -56,6 +69,15 @@
   </div>
   <div class="card"><div id="rgrid"></div></div>
   <div id="imod"><button class="cm" onclick="closeMod()">✕</button><div class="mw"><img id="mimg" src=""></div><div class="mi"><div class="mn" id="mname"></div><div class="mm" id="mmeta"></div><a id="mdl" href="" download class="dlbtn">💾 Download Photo</a></div></div>
+  <div id="hmod">
+    <div class="hc">
+      <h2>💡 Tracking Guide</h2>
+      <div class="gi"><span class="icon">🚛</span><div><b>DTDC Courier</b><p>Tracking numbers usually start with <b>D, W, X, or U</b>.</p></div></div>
+      <div class="gi"><span class="icon">🚚</span><div><b>Trackon Courier</b><p>The company name is usually mentioned on the label.</p></div></div>
+      <div class="gi"><span class="icon">📦</span><div><b>Delhivery Courier</b><p>Tracking numbers usually start with <b>'19' or '35'</b>.</p></div></div>
+      <button class="close-h" onclick="closeHelp()">Got it!</button>
+    </div>
+  </div>
   <script>
     const CFGKEY = 'gh_tracking_config';
     let allRecords = [];
@@ -100,6 +122,8 @@
       document.getElementById('imod').classList.add('open');
     }
     function closeMod() { document.getElementById('imod').classList.remove('open'); }
+    function openHelp() { document.getElementById('hmod').classList.add('open'); }
+    function closeHelp() { document.getElementById('hmod').classList.remove('open'); }
     loadData();
   </script>
 </body>
