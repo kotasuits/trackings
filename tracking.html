@@ -715,7 +715,9 @@
                 const r = await ghGet(`repos/${cfg.repo}`);
                 st.className = 'cfg-status ok'; st.textContent = `✅ Connected to "${r.full_name}" (${r.private ? 'private' : 'public'})`;
             } catch (e) {
-                st.className = 'cfg-status bad'; st.textContent = '❌ ' + e.message;
+                console.error('GitHub Connection Error:', e);
+                st.className = 'cfg-status bad'; st.textContent = '❌ Connection Failed: ' + e.message;
+                toast('Could not connect to GitHub. Check your token and repo name.', 'er');
             }
         }
 
@@ -861,7 +863,7 @@
             g.innerHTML = pending.map((p, i) => `
     <div class="pc" id="pc-${p.id}">
       <div class="qr-status">${p.status}</div>
-      <img src="${p.dataUrl}" alt="">
+      <img id="img-${p.id}" src="${p.dataUrl}" alt="">
       <button class="rm" onclick="rmPending('${p.id}')">✕</button>
       <div class="pb">
         <div class="fg"><label>Name</label><input type="text" id="n-${p.id}" placeholder="Customer name" value="${p.name}" oninput="upd('${p.id}','name',this.value)"></div>
@@ -953,7 +955,7 @@
                 if (!p.courier) { document.getElementById(`c-${p.id}`)?.classList.add('err'); ok = false; }
                 if (!p.trackingId) { document.getElementById(`t-${p.id}`)?.classList.add('err'); ok = false; }
             });
-            if (!ok) { toast('Fill all Name, Pincode & Phone fields', 'er'); return; }
+            if (!ok) { toast('Please fill all fields (Name, Pincode, Phone, Courier, and Tracking ID) for all photos.', 'er'); return; }
             if (!cfg.token || !cfg.repo) { toast('Save GitHub config first!', 'er'); return; }
 
             const btn = document.getElementById('ubtn');
