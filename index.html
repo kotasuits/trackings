@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Search Tracking Photos</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
   <style>
     :root {
       --primary: #6366f1;
@@ -69,47 +68,6 @@
       margin-bottom: 22px;
     }
 
-    /* Config */
-    .cfg-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 10px;
-      align-items: flex-end;
-    }
-
-    @media(max-width:600px) {
-      .cfg-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .fld label {
-      display: block;
-      font-size: .7rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      margin-bottom: 4px;
-    }
-
-    .fld input {
-      width: 100%;
-      background: var(--inp);
-      border: 1px solid var(--bdr);
-      border-radius: 9px;
-      padding: 10px 13px;
-      color: var(--txt);
-      font-size: .9rem;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-    }
-
-    .fld input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, .2);
-    }
-
     /* Search */
     .sbox {
       position: relative;
@@ -140,63 +98,6 @@
     .sbox input:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(99, 102, 241, .2);
-    }
-
-    .sbox input::placeholder {
-      color: var(--muted);
-    }
-
-    .fbts {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .fb {
-      background: rgba(255, 255, 255, .05);
-      border: 1.5px solid var(--bdr);
-      color: var(--muted);
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: .83rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .2s;
-    }
-
-    .fb:hover {
-      border-color: var(--pl);
-      color: var(--pl);
-    }
-
-    .fb.on {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
-    }
-
-    /* Stats */
-    .rstats {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-      font-size: .88rem;
-      color: var(--muted);
-      flex-wrap: wrap;
-    }
-
-    .rstats strong {
-      color: var(--pl);
-    }
-
-    .rbadge {
-      background: rgba(99, 102, 241, .15);
-      color: var(--pl);
-      padding: 2px 11px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: .82rem;
     }
 
     /* Results grid */
@@ -255,18 +156,6 @@
       font-weight: 600;
     }
 
-    .chip.ph {
-      background: rgba(34, 211, 238, .1);
-      border-color: rgba(34, 211, 238, .25);
-      color: #67e8f9;
-    }
-
-    .chip.dt {
-      background: rgba(255, 255, 255, .05);
-      border-color: var(--bdr);
-      color: var(--muted);
-    }
-
     .vo {
       position: absolute;
       inset: 0;
@@ -299,36 +188,6 @@
       transform: scale(1);
     }
 
-    mark {
-      background: rgba(253, 224, 71, .3);
-      color: #fde047;
-      border-radius: 3px;
-      padding: 0 2px;
-    }
-
-    /* State boxes */
-    .sb {
-      text-align: center;
-      padding: 55px 20px;
-      color: var(--muted);
-    }
-
-    .sb .si2 {
-      font-size: 3.2rem;
-      margin-bottom: 12px;
-    }
-
-    .sb h3 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--txt);
-      margin-bottom: 5px;
-    }
-
-    .sb p {
-      font-size: .92rem;
-    }
-
     /* Modal */
     #imod {
       display: none;
@@ -338,7 +197,6 @@
       z-index: 10000;
       overflow-y: auto;
       padding: 60px 10px;
-      -webkit-overflow-scrolling: touch;
     }
 
     #imod.open {
@@ -347,16 +205,9 @@
       align-items: center;
     }
 
-    #imod .mw, #imod .mi {
-      margin-top: auto;
-      margin-bottom: auto;
-      flex-shrink: 0;
-    }
-
-    #imod .mw { margin-bottom: 18px; }
-
     #imod .mw {
       max-width: 90vw;
+      margin-bottom: 18px;
     }
 
     #imod .mw img {
@@ -364,7 +215,6 @@
       max-height: 72vh;
       border-radius: 13px;
       box-shadow: 0 18px 55px rgba(0, 0, 0, .6);
-      display: block;
     }
 
     #imod .mi {
@@ -382,13 +232,6 @@
       margin-bottom: 8px;
     }
 
-    #imod .mi .mm {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
     #imod .cm {
       position: fixed;
       top: 16px;
@@ -404,66 +247,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background .2s;
-    }
-
-    #imod .cm:hover {
-      background: rgba(255, 255, 255, .26);
-    }
-
-    /* Tracking Bar */
-    .tbar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(99, 102, 241, .15);
-      border: 1px solid rgba(99, 102, 241, .3);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 18px;
-      cursor: pointer;
-      transition: all .2s;
-      position: relative;
-    }
-
-    .tbar:hover {
-      background: rgba(99, 102, 241, .25);
-      transform: scale(1.01);
-    }
-
-    .tbar:active { transform: scale(.98); }
-
-    .tbar .t-icon { font-size: 1.4rem; }
-    .tbar .t-info { flex: 1; }
-    .tbar .t-info .t-label { font-size: .65rem; font-weight: 800; color: var(--pl); text-transform: uppercase; letter-spacing: 1px; }
-    .tbar .t-info .t-val { font-size: 1.05rem; font-weight: 700; color: #fff; }
-    .tbar .t-copy { font-size: .8rem; color: var(--pl); font-weight: 600; }
-
-    .t-toast {
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%) scale(0.5);
-      background: var(--ok);
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: .8rem;
-      font-weight: 800;
-      opacity: 0;
-      transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      pointer-events: none;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-      z-index: 20;
-    }
-    .tbar.copied .t-toast { opacity: 1; top: -45px; transform: translateX(-50%) scale(1); }
-
-    #scan-st {
-      font-size: .8rem;
-      color: var(--muted);
-      font-style: italic;
-      margin-bottom: 10px;
-      text-align: center;
     }
 
     .dlbtn {
@@ -477,505 +260,95 @@
       border-radius: 9px;
       font-weight: 600;
       font-size: .88rem;
-      transition: all .2s;
     }
-
-    .dlbtn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 18px rgba(99, 102, 241, .5);
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 10px 20px;
-      border-radius: 9px;
-      border: none;
-      font-size: .9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .2s;
-    }
-
-    .btn-s {
-      background: rgba(255, 255, 255, .06);
-      color: var(--muted);
-      border: 1px solid var(--bdr);
-    }
-
-    .btn-s:hover {
-      background: rgba(255, 255, 255, .12);
-      color: #fff;
-    }
-
-    @media(max-width:580px) {
-      #rgrid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-
-      #imod .mi {
-        width: 95vw;
-        padding: 16px;
-      }
-
-      .tlinks {
-        grid-template-columns: 1fr 1fr;
-      }
-      
-      .tlink {
-        padding: 10px 6px;
-        font-size: 0.8rem;
-      }
-      
-      .tlink span { font-size: 1.3rem; }
-    }
-
-    @media(max-width:400px) {
-      .tlinks {
-        grid-template-columns: 1fr;
-      }
-      
-      .hc {
-        padding: 20px;
-      }
-    }
-
-    .tlinks {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 24px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--bdr);
-    }
-
-    .tlinks label {
-      grid-column: 1 / -1;
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: var(--pl);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-
-    .tlink {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      background: rgba(99, 102, 241, 0.08);
-      border: 1.5px solid rgba(99, 102, 241, 0.2);
-      color: #fff;
-      padding: 14px 10px;
-      border-radius: 14px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-decoration: none;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .tlink span {
-      font-size: 1.5rem;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    }
-
-    .tlink:hover {
-      background: var(--primary);
-      border-color: var(--pl);
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.35);
-    }
-
-    .tlink.dtdc { border-color: rgba(250, 204, 21, 0.4); background: rgba(250, 204, 21, 0.1); }
-    .tlink.trackon { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); }
-    .tlink.delhivery { border-color: rgba(34, 211, 238, 0.4); background: rgba(34, 211, 238, 0.1); }
-
-    .tlink.dtdc:hover { background: #eab308; color: #000; border-color: #fef08a; }
-    .tlink.trackon:hover { background: #ef4444; color: #fff; border-color: #fca5a5; }
-    .tlink.delhivery:hover { background: #06b6d4; color: #fff; border-color: #67e8f9; }
-
-    /* Help Popup */
-    #hmod {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 10001;
-      overflow-y: auto;
-      padding: 40px 10px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    #hmod.open {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .hc {
-      margin-top: auto;
-      margin-bottom: auto;
-      flex-shrink: 0;
-      background: var(--card);
-      border: 1px solid var(--bdr);
-      border-radius: 24px;
-      padding: 30px;
-      max-width: 400px;
-      width: 100%;
-      position: relative;
-      animation: pop .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes pop {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .hc h2 {
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-      background: linear-gradient(135deg, #fff, var(--pl));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .gi {
-      display: flex;
-      align-items: flex-start;
-      gap: 15px;
-      margin-bottom: 18px;
-    }
-
-    .gi .icon {
-      font-size: 1.6rem;
-      flex-shrink: 0;
-    }
-
-    .gi div b {
-      display: block;
-      color: var(--pl);
-      margin-bottom: 3px;
-    }
-
-    .gi div p {
-      font-size: 0.9rem;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .close-h {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: #fff;
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      margin-top: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background .2s;
-    }
-
-    .close-h:hover { background: rgba(255, 255, 255, 0.2); }
-
-    .help-link {
-      display: inline-block;
-      font-size: 0.75rem;
-      color: var(--pl);
-      cursor: pointer;
-      margin-bottom: 8px;
-      text-decoration: underline;
-      opacity: 0.8;
-      transition: opacity 0.2s;
-    }
-
-    .help-link:hover { opacity: 1; }
   </style>
 </head>
 
 <body>
-  <div id="hmod">
-    <div class="hc">
-      <h2>💡 Tracking Guide</h2>
-      <div class="gi">
-        <span class="icon">🚛</span>
-        <div>
-          <b>DTDC Courier</b>
-          <p>Tracking numbers for DTDC usually start with <strong>D, W, X, or U</strong>.</p>
-        </div>
-      </div>
-      <div class="gi">
-        <span class="icon">🚚</span>
-        <div>
-          <b>Trackon Courier</b>
-          <p>The company name is clearly mentioned on the label in the photo.</p>
-        </div>
-      </div>
-      <div class="gi">
-        <span class="icon">📦</span>
-        <div>
-          <b>Delhivery Courier</b>
-          <p>Tracking numbers for Delhivery usually start with <strong>'356'</strong>.</p>
-        </div>
-      </div>
-      <button class="close-h" onclick="closeHelp()">Got it!</button>
-    </div>
-  </div>
-
   <div class="ph">
     <h1>🔎 Search Tracking Photos</h1>
     <p>Please enter your phone number to find your tracking photo.</p>
   </div>
 
-
-
-  <!-- Search -->
   <div class="card">
     <div class="sbox"><span class="si">🔍</span><input type="text" id="si"
-        placeholder="Please enter phone number to find tracking..." autocomplete="off" autofocus
+        placeholder="Enter phone number..." autocomplete="off" autofocus
         oninput="doSearch()"></div>
   </div>
 
-  <!-- Results -->
   <div class="card">
-    <div class="rstats" id="rstats" style="display:none;">
-      Showing <strong id="rcnt">0</strong> result(s) <span class="rbadge" id="rbadge">0</span>
-    </div>
-    <div id="rc">
-      <div class="sb" id="init-st">
-        <div class="si2">🔎</div>
-        <h3>Start searching</h3>
-        <p>Please enter your phone number above.</p>
-      </div>
-      <div class="sb" id="empty-st" style="display:none;">
-        <div class="si2">😕</div>
-        <h3>No results found</h3>
-        <p>Try a different search term.</p>
-      </div>
-      <div class="sb" id="norec-st" style="display:none;">
-        <div class="si2">📭</div>
-        <h3>No records loaded</h3>
-        <p>Unable to connect to the tracking database.</p>
-      </div>
-      <div class="sb" id="load-st" style="display:none;">
-        <div class="si2">⏳</div>
-        <h3>Loading tracking data…</h3>
-        <p>Please wait.</p>
-      </div>
-      <div id="rgrid"></div>
-    </div>
+    <div id="rgrid"></div>
   </div>
 
-  <!-- Modal -->
   <div id="imod">
     <button class="cm" onclick="closeMod()">✕</button>
     <div class="mw"><img id="mimg" src="" alt=""></div>
     <div class="mi">
       <div class="mn" id="mname"></div>
       <div class="mm" id="mmeta"></div>
-
-      <div id="scan-st"></div>
-      <div id="tbar-box" style="display:none;">
-        <div class="tbar" id="tbar" onclick="copyTracking()">
-          <div class="t-toast" id="t-toast">COPIED!</div>
-          <div class="t-icon">📦</div>
-          <div class="t-info">
-            <div class="t-label" id="t-courier">Courier</div>
-            <div class="t-val" id="t-number">---</div>
-          </div>
-          <div class="t-copy">TAP TO COPY</div>
-        </div>
-      </div>
-      
-      <div style="display:flex; justify-content: space-between; align-items: flex-end;">
-        <label style="font-size: 0.75rem; font-weight: 800; color: var(--pl); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Track Package On:</label>
-        <span class="help-link" onclick="openHelp()">Need help?</span>
-      </div>
-
-      <div class="tlinks" style="border-bottom: none; margin-bottom: 10px; padding-bottom: 0;">
-        <a href="https://www.dtdc.in/" target="_blank" class="tlink dtdc"><span>🚛</span>DTDC</a>
-        <a href="https://www.trackon.in/" target="_blank" class="tlink trackon"><span>🚚</span>Trackon</a>
-        <a href="https://www.delhivery.com/tracking" target="_blank" class="tlink delhivery"><span>📦</span>Delhivery</a>
-      </div>
-
-      <a id="mdl" class="dlbtn" download="tracking_photo.jpg">⬇️ Download Photo</a>
+      <a id="mdl" href="" download class="dlbtn">💾 Download Photo</a>
     </div>
   </div>
 
   <script>
+    const OWNER = 'thecraftyriz';
+    const REPO = 'thecraftyriz';
+    const PATH = 'records.json';
+    const TOKEN_KEY = 'gh_tracking_token';
+
     let allRecords = [];
-    let activeFilter = 'all';
 
-    function detectCourier(tn) {
-        if (!tn) return '';
-        tn = tn.trim().toUpperCase();
-        // Delhivery: 12-14 digits, starts with 19 or 356
-        if (/^(19|35)\d{10,12}$/.test(tn)) return 'Delhivery';
-        // DTDC: Starts with D, W, X, U, V, B followed by 9-11 digits
-        if (/^[DWXUVB]\d{9,11}$/.test(tn)) return 'DTDC';
-        // Trackon: 10-12 digits, often starts with 100
-        if (/^100\d{9}$/.test(tn) || /^\d{10,12}$/.test(tn)) return 'Trackon';
-        return 'Courier';
-    }
-
-    function copyTracking() {
-        const val = document.getElementById('t-number').textContent;
-        if (!val || val === '---') return;
-        navigator.clipboard.writeText(val);
-        const bar = document.getElementById('tbar');
-        bar.classList.add('copied');
-        setTimeout(() => bar.classList.remove('copied'), 2000);
-    }
-
-    // State helpers
-    function showState(id) {
-      ['init-st', 'empty-st', 'norec-st', 'load-st'].forEach(s => document.getElementById(s).style.display = 'none');
-      document.getElementById(id).style.display = 'block';
-      document.getElementById('rgrid').innerHTML = '';
-      document.getElementById('rstats').style.display = 'none';
-    }
-
-    // Load records
-    async function loadAndSearch() {
-      showState('load-st');
+    async function loadData() {
+      const ghp = localStorage.getItem(TOKEN_KEY);
+      if (!ghp) return;
       try {
-        let res = await fetch('records.json');
-        if (!res.ok) throw new Error('Tracking records not found. Ensure records.json is in the same folder.');
-        allRecords = await res.json();
-        
-        showState('init-st');
-        const q = document.getElementById('si').value.trim();
-        if (q.length >= 4) doSearch();
+        const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`, {
+          headers: { Authorization: `token ${ghp}` }
+        });
+        const data = await res.json();
+        allRecords = JSON.parse(atob(data.content)).reverse();
       } catch (e) {
-        showState('norec-st');
-        document.getElementById('norec-st').querySelector('p').textContent = e.message;
+        console.error(e);
       }
-    }
-
-    function hl(text, q) {
-      if (!q) return text;
-      return String(text).replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<mark>$1</mark>');
-    }
-    function fmtDate(iso) {
-      if (!iso) return '';
-      const d = new Date(iso); if (isNaN(d)) return iso;
-      const p = n => String(n).padStart(2, '0');
-      return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
     }
 
     function doSearch() {
-      const raw = document.getElementById('si').value.trim();
-      const q = raw.toLowerCase();
-      if (!allRecords.length) { showState('norec-st'); return; }
+      const q = document.getElementById('si').value.trim();
+      const g = document.getElementById('rgrid');
+      if (!q) { g.innerHTML = ''; return; }
 
-      // Require at least 4 characters to prevent showing too many/all results
-      if (q.length < 4) { showState('init-st'); return; }
-
-      const matched = allRecords.filter(r =>
-        String(r.pincode || '').toLowerCase().includes(q) || String(r.phone || '').toLowerCase().includes(q)
-      );
-
-      ['init-st', 'empty-st', 'norec-st', 'load-st'].forEach(s => document.getElementById(s).style.display = 'none');
-
-      if (!matched.length) { document.getElementById('empty-st').style.display = 'block'; document.getElementById('rstats').style.display = 'none'; document.getElementById('rgrid').innerHTML = ''; return; }
-
-      document.getElementById('rstats').style.display = 'flex';
-      document.getElementById('rcnt').textContent = matched.length;
-      document.getElementById('rbadge').textContent = matched.length;
-
-      document.getElementById('rgrid').innerHTML = matched.map(r => `
-    <div class="rc" onclick="openMod('${r.id}')">
-      <div class="vo"><span>🔍 View Photo</span></div>
-      <img src="${r.photoUrl}" alt="${r.name}" loading="lazy">
-      <div class="ci">
-        <div class="cn">👤 ${hl(r.name, q)}</div>
-        <div class="ml">
-          <span class="chip">📍 ${hl(r.pincode, q)}</span>
-          <span class="chip ph">📞 ${hl(r.phone, q)}</span>
-          <span class="chip dt">🕐 ${fmtDate(r.uploadedAt)}</span>
+      const results = allRecords.filter(r => r.phone.includes(q));
+      g.innerHTML = results.map(r => `
+        <div class="rc" onclick='openMod(${JSON.stringify(r)})'>
+          <img src="${r.photoUrl}" alt="">
+          <div class="vo"><span>View Photo</span></div>
+          <div class="ci">
+            <div class="cn">${r.name}</div>
+            <div class="ml">
+              <span class="chip ph">${r.phone}</span>
+              <span class="chip">📍 ${r.pincode}</span>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>`).join('');
+      `).join('');
     }
 
-    function openMod(id) {
-      const r = allRecords.find(x => x.id === id);
-      if (!r) return;
+    function openMod(r) {
       document.getElementById('mimg').src = r.photoUrl;
-      document.getElementById('mname').textContent = `👤 ${r.name}`;
-      document.getElementById('mmeta').innerHTML = `<span class="chip">📍 ${r.pincode}</span><span class="chip ph">📞 ${r.phone}</span><span class="chip dt">🕐 ${fmtDate(r.uploadedAt)}</span>`;
-      const dl = document.getElementById('mdl');
-      dl.href = r.photoUrl; dl.download = `tracking_${r.name}_${r.pincode}.jpg`;
-      
-      // Tracking Number Logic
-      const tBox = document.getElementById('tbar-box');
-      const sSt = document.getElementById('scan-st');
-      tBox.style.display = 'none';
-      sSt.textContent = '';
-
-      if (r.trackingNumber) {
-        showTracking(r.trackingNumber, r.courier);
-      } else {
-        // Try auto-scan on open
-        scanImage(r.photoUrl);
-      }
-
+      document.getElementById('mname').textContent = r.name;
+      document.getElementById('mmeta').innerHTML = `
+        <span class="chip ph">${r.phone}</span>
+        <span class="chip">📍 ${r.pincode}</span>
+      `;
+      document.getElementById('mdl').href = r.photoUrl;
       document.getElementById('imod').classList.add('open');
     }
 
-    function showTracking(tn, courier) {
-      document.getElementById('t-number').textContent = tn;
-      document.getElementById('t-courier').textContent = courier || detectCourier(tn);
-      document.getElementById('tbar-box').style.display = 'block';
-      document.getElementById('scan-st').textContent = '';
+    function closeMod() {
+      document.getElementById('imod').classList.remove('open');
     }
 
-    async function scanImage(url) {
-      const sSt = document.getElementById('scan-st');
-      sSt.textContent = '🔍 Scanning barcode...';
-      
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.onload = async () => {
-        const cvs = document.createElement('canvas');
-        const ctx = cvs.getContext('2d');
-        let w = img.width, h = img.height;
-        if (w > 1000) { h *= 1000/w; w = 1000; }
-        cvs.width = w; cvs.height = h;
-        ctx.drawImage(img, 0, 0, w, h);
-        
-        try {
-          const reader = new ZXing.BrowserMultiFormatReader();
-          const result = await reader.decodeFromCanvas(cvs);
-          if (result) {
-            showTracking(result.text, detectCourier(result.text));
-            sSt.textContent = '✅ Barcode found!';
-          } else {
-            sSt.textContent = '⚠️ No barcode detected.';
-          }
-        } catch (err) {
-          sSt.textContent = '⚠️ Barcode not found.';
-        }
-      };
-      img.src = url;
-    }
-    function closeMod() { document.getElementById('imod').classList.remove('open'); document.getElementById('mimg').src = ''; }
-    document.getElementById('imod').addEventListener('click', e => { if (e.target === document.getElementById('imod')) closeMod(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeMod(); closeHelp(); } });
-
-    // Help functions
-    function openHelp() { document.getElementById('hmod').classList.add('open'); }
-    function closeHelp() { document.getElementById('hmod').classList.remove('open'); }
-    document.getElementById('hmod').addEventListener('click', e => { if (e.target === document.getElementById('hmod')) closeHelp(); });
-
-    // Init
-    loadAndSearch();
+    loadData();
   </script>
 </body>
 
