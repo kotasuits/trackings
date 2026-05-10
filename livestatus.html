@@ -54,10 +54,8 @@
             background: rgba(255,255,255,0.05);
             transition: all 0.2s;
         }
-        .back-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-        }
+        .back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
         #YQContainer {
             width: 100%;
             min-height: 600px;
@@ -75,10 +73,32 @@
             text-align: center;
         }
         .info-card span { color: var(--primary); font-weight: 700; }
-        .carrier-info {
-            font-size: 0.9rem;
-            margin-top: 8px;
-            color: var(--muted);
+
+        .pincode-row {
+            margin-top: 12px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .pincode-row input {
+            padding: 10px 12px;
+            width: 140px;
+            border-radius: 8px;
+            border: 1px solid var(--bdr);
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-size: 1rem;
+        }
+        .pincode-row button {
+            padding: 10px 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -94,6 +114,12 @@
         <div class="info-card">
             Tracking Number: <span id="awb-display">Loading...</span>
             <div class="carrier-info" id="carrier-info"></div>
+            
+            <!-- Pincode Input (only for Delhivery) -->
+            <div class="pincode-row" id="pincode-row">
+                <input type="text" id="pincode" placeholder="Enter Pincode" maxlength="6">
+                <button onclick="startTracking()">Track Now</button>
+            </div>
         </div>
         
         <div id="YQContainer">
@@ -107,50 +133,77 @@
         const params = new URLSearchParams(window.location.search);
         const awb = params.get('awb')?.trim();
 
+        let currentCarrierCode = "0";
+        let isDelhivery = false;
+
         if (!awb) {
             document.querySelector('.info-card').innerHTML = "❌ No tracking number provided.";
             document.getElementById('YQContainer').style.display = 'none';
         } else {
             document.getElementById('awb-display').textContent = awb;
 
-            // Smart Carrier Detection for Indian Couriers
             function getCarrierCode(trackingNum) {
                 const num = trackingNum.toUpperCase();
 
                 if (num.startsWith('D')) {
                     document.getElementById('carrier-info').textContent = 'Carrier: DTDC';
-                    return "100069";        // DTDC
+                    isDelhivery = false;
+                    return "100069";
                 }
                 if (num.startsWith('5006')) {
                     document.getElementById('carrier-info').textContent = 'Carrier: Trackon';
-                    return "100180";        // Trackon
+                    isDelhivery = false;
+                    return "100180";
                 }
                 if (num.startsWith('356') || num.startsWith('19')) {
                     document.getElementById('carrier-info').textContent = 'Carrier: Delhivery';
-                    return "100060";        // Delhivery
+                    isDelhivery = true;
+                    document.getElementById('pincode-row').style.display = 'flex';
+                    return "100060";
                 }
 
-                // Default: Let 17Track auto-detect
                 document.getElementById('carrier-info').textContent = 'Carrier: Auto Detecting...';
+                isDelhivery = false;
                 return "0";
             }
 
-            function initTracking() {
-                if (typeof YQV5 !== 'undefined') {
-                    document.getElementById('YQContainer').innerHTML = '';
-
-                    const carrierCode = getCarrierCode(awb);
-
-                    YQV5.trackSingle({
-                        YQ_ContainerId: "YQContainer",
-                        YQ_Height: 600,
-                        YQ_Lang: "en",
-                        YQ_Num: awb,
-                        YQ_Fc: carrierCode
-                    });
-                } else {
-                    setTimeout(initTracking, 400);
+            function startTracking() {
+                if (typeof YQV5 === 'undefined') {
+                    alert("Tracking service not ready yet. Please wait...");
+                    return;
                 }
+
+                document.getElementById('YQContainer').innerHTML = '';
+
+                const pincode = document.getElementById('pincode').value.trim();
+
+                let options = {
+                    YQ_ContainerId: "YQContainer",
+                    YQ_Height: 650,
+                    YQ_Lang: "en",
+                    YQ_Num: awb,
+                    YQ_Fc: currentCarrierCode
+                };
+
+                // For Delhivery, pass pincode if available
+                if (isDelhivery && pincode.length === 6) {
+                    options.YQ_Extra = pincode;     // Most common parameter
+                    // Alternative: options.param = pincode;
+                }
+
+                YQV5.trackSingle(options);
+            }
+
+            function initTracking() {
+                currentCarrierCode = getCarrierCode(awb);
+
+                // Auto track if not Delhivery
+                if (!isDelhivery) {
+                    setTimeout(() => {
+                        startTracking();
+                    }, 800);
+                }
+                // For Delhivery, wait for user to enter pincode
             }
 
             if (document.readyState === 'loading') {
