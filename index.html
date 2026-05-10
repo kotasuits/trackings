@@ -450,11 +450,17 @@
         <a href="https://trackon.in/" target="_blank" class="tlink trackon"><span>🚚</span> Trackon</a>
         <a href="https://www.delhivery.com/tracking" target="_blank" class="tlink delhivery"><span>📦</span> Delhivery</a>
       </div>
+      <div class="track-input-box" style="margin-top:20px; border-top:1px solid var(--bdr); padding-top:20px;">
+        <label style="display:block; font-size:.72rem; color:var(--muted); margin-bottom:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">👇 Enter Tracking ID (Look at the photo above)</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="manual-awb" placeholder="Type AWB / Tracking Number" style="flex:1; background:var(--inp); border:1px solid var(--bdr); border-radius:8px; padding:10px; color:#fff; outline:none; font-size:0.9rem;">
+          <button class="dlbtn" style="margin-top:0; padding:0 20px; background:var(--primary); font-size:0.85rem;" onclick="startManualTrack()">Track Now</button>
+        </div>
+      </div>
 
       <div id="track-area" style="display:none; margin-top:15px; border-top:1px solid var(--bdr); padding-top:15px;">
-        <div id="YQContainer" style="width:100%; height:300px; border-radius:10px; overflow:hidden;"></div>
+        <div id="YQContainer" style="width:100%; height:300px; border-radius:10px; overflow:hidden; background:white;"></div>
       </div>
-      <button id="track-btn" class="dlbtn" style="width:100%; justify-content:center; margin-top:10px; background:linear-gradient(135deg, #10b981, #059669); display:none;" onclick="startTrack()">🚚 Track Live Status</button>
 
       <a id="mdl" class="dlbtn" style="width:100%; justify-content:center; margin-top:15px;" download="tracking_photo.jpg">⬇️ Download Photo</a>
     </div>
@@ -557,47 +563,37 @@
       }).join('');
     }
 
-    let currentTrackingId = '';
-
     function openMod(id) {
       const r = allRecords.find(x => x.id === id);
       if (!r) return;
       document.getElementById('mimg').src = r.photoUrl;
       document.getElementById('mname').textContent = `👤 ${r.name}`;
-      
-      let meta = `<span class="chip">📍 ${r.pincode}</span><span class="chip ph">📞 ${r.phone}</span><span class="chip dt">🕐 ${fmtDate(r.uploadedAt)}</span>`;
-      if (r.courier && r.trackingId) {
-        meta += `<br><span style="color:var(--pl);font-weight:600;margin-top:8px;display:inline-block;">🚚 ${r.courier}: ${r.trackingId}</span>`;
-        currentTrackingId = r.trackingId;
-        document.getElementById('track-btn').style.display = 'flex';
-      } else {
-        document.getElementById('track-btn').style.display = 'none';
-        currentTrackingId = '';
-      }
-      document.getElementById('mmeta').innerHTML = meta;
+      document.getElementById('mmeta').innerHTML = `<span class="chip">📍 ${r.pincode}</span><span class="chip ph">📞 ${r.phone}</span><span class="chip dt">🕐 ${fmtDate(r.uploadedAt)}</span>`;
       
       const dl = document.getElementById('mdl');
       dl.href = r.photoUrl; dl.download = `tracking_photo.jpg`;
 
+      // Reset tracking area
+      document.getElementById('manual-awb').value = '';
       document.getElementById('track-area').style.display = 'none';
       document.getElementById('YQContainer').innerHTML = '';
       
       document.getElementById('imod').classList.add('open');
     }
 
-    function startTrack() {
-      if (!currentTrackingId || typeof YQ511 === 'undefined') {
-        alert("Tracking service is loading or unavailable. Please try again.");
-        return;
-      }
+    function startManualTrack() {
+      const num = document.getElementById('manual-awb').value.trim();
+      if (!num) { alert("Please enter the tracking ID from the photo."); return; }
+      if (typeof YQ511 === 'undefined') { alert("Tracking service is still loading, please wait a second."); return; }
+      
       document.getElementById('track-area').style.display = 'block';
-      document.getElementById('track-btn').style.display = 'none';
+      document.getElementById('YQContainer').innerHTML = '';
       
       YQ511.trackSingle({
         YQ_ContainerId: "YQContainer",
         YQ_Height: 300,
         YQ_Lang: "en",
-        YQ_Num: currentTrackingId
+        YQ_Num: num
       });
     }
 
