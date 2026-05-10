@@ -710,19 +710,40 @@
         async function testConfig() {
             saveConfig();
             const st = document.getElementById('cfg-status');
-            st.className = 'cfg-status'; st.textContent = 'Testing…'; st.style.display = 'block';
+            st.className = 'cfg-status'; st.textContent = 'Testing connection...'; st.style.display = 'block';
+            
+            if (!cfg.repo.includes('/')) {
+                st.className = 'cfg-status bad'; 
+                st.innerHTML = '❌ <b>Invalid Repo Format</b><br>Please use "owner/repo" (e.g., <i>thecraftyriz/thecraftyriz</i>)';
+                return;
+            }
+
             try {
                 const r = await ghGet(`repos/${cfg.repo}`);
-                st.className = 'cfg-status ok'; st.textContent = `✅ Connected to "${r.full_name}" (${r.private ? 'private' : 'public'})`;
+                st.className = 'cfg-status ok'; 
+                st.innerHTML = `✅ <b>Connected!</b><br>Repository: ${r.full_name}<br>Visibility: ${r.private ? '🔒 Private' : '🌐 Public'}`;
+                toast('GitHub Connection Successful!', 'ok');
             } catch (e) {
-                console.error('GitHub Connection Error:', e);
-                st.className = 'cfg-status bad'; st.textContent = '❌ Connection Failed: ' + e.message;
-                toast('Could not connect to GitHub. Check your token and repo name.', 'er');
+                console.error('Connection Failed:', e);
+                let help = 'Check your Token and Repository name.';
+                if (e.message.includes('401')) help = 'Invalid Token. Please check your GitHub Personal Access Token.';
+                if (e.message.includes('404')) help = 'Repository not found. Check the owner/repo name.';
+                
+                st.className = 'cfg-status bad'; 
+                st.innerHTML = `❌ <b>Connection Failed</b><br>${e.message}<br><small>${help}</small>`;
+                toast('GitHub Connection Failed', 'er');
             }
         }
 
         // ── GitHub API ──
-        function ghHeaders() { return { 'Authorization': 'token ' + cfg.token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' }; }
+        function ghHeaders() { 
+            // Support both 'token' and 'Bearer' styles; Bearer is more universal for modern PATs
+            return { 
+                'Authorization': `Bearer ${cfg.token}`, 
+                'Content-Type': 'application/json', 
+                'Accept': 'application/vnd.github.v3+json' 
+            }; 
+        }
         async function ghGet(path) {
             const r = await fetch(`https://api.github.com/${path}`, { headers: ghHeaders() });
             if (!r.ok) { const e = await r.json(); throw new Error(e.message || r.status); }
