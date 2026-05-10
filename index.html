@@ -487,9 +487,17 @@
     async function loadAndSearch() {
       showState('load-st');
       try {
-        // Cache buster to ensure it fetches the latest records
-        let res = await fetch('records.json?v=' + Date.now());
-        if (!res.ok) throw new Error('Tracking records not found. Ensure records.json is in the same folder.');
+        // Try fetching from GitHub directly for latest data
+        const repo = 'thecraftyriz/thecraftyriz'; 
+        const branch = 'main';
+        let res = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/records.json?v=` + Date.now());
+        
+        if (!res.ok) {
+           // Fallback to local if GitHub fails
+           res = await fetch('records.json?v=' + Date.now());
+        }
+        
+        if (!res.ok) throw new Error('Tracking records not found on GitHub or locally.');
         allRecords = await res.json();
         
         showState('init-st');
