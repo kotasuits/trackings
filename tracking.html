@@ -7,7 +7,6 @@
     <title>Tracking Photo Upload</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-    <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -257,21 +256,6 @@
             border-radius: 12px;
             font-weight: 600;
             backdrop-filter: blur(4px);
-            z-index: 10;
-        }
-
-        .pc .bc-badge {
-            position: absolute;
-            top: 35px;
-            left: 7px;
-            background: rgba(99, 102, 241, 0.85);
-            color: #fff;
-            font-size: 0.7rem;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-            backdrop-filter: blur(4px);
-            z-index: 10;
         }
 
         .pc .pb {
@@ -690,18 +674,6 @@
         let pending = [];
         let cfg = {};
 
-        function detectCourier(tn) {
-            if (!tn) return '';
-            tn = tn.trim().toUpperCase();
-            // Delhivery: 12-14 digits, starts with 19 or 356
-            if (/^(19|35)\d{10,12}$/.test(tn)) return 'Delhivery';
-            // DTDC: Starts with D, W, X, U, V, B followed by 9-11 digits
-            if (/^[DWXUVB]\d{9,11}$/.test(tn)) return 'DTDC';
-            // Trackon: 10-12 digits, often starts with 100
-            if (/^100\d{9}$/.test(tn) || /^\d{10,12}$/.test(tn)) return 'Trackon';
-            return 'Courier';
-        }
-
         // ── Config ──
         function loadConfig() {
             try { cfg = JSON.parse(localStorage.getItem(CFGKEY) || '{}'); } catch { cfg = {}; }
@@ -797,13 +769,13 @@
                 r.onload = e => {
                     const dataUrl = e.target.result;
                     const pid = uid();
-                    const pObj = { id: pid, dataUrl, file: f, name: '', pincode: '', phone: '', trackingNumber: '', courier: '', status: 'Scanning...', bcStatus: '' };
+                    const pObj = { id: pid, dataUrl, file: f, name: '', pincode: '', phone: '', status: 'Scanning QR...' };
                     pending.push(pObj);
                     renderGrid();
 
-                    // Auto-fetch via QR Code & Barcode
+                    // Auto-fetch via QR Code
                     const img = new Image();
-                    img.onload = async () => {
+                    img.onload = () => {
                         const cvs = document.createElement('canvas');
                         const ctx = cvs.getContext('2d');
                         let w = img.width, h = img.height;
@@ -812,9 +784,8 @@
                         cvs.width = w; cvs.height = h;
                         ctx.drawImage(img, 0, 0, w, h);
                         const imgData = ctx.getImageData(0, 0, w, h);
-                        
-                        // 1. Scan QR
                         const code = jsQR(imgData.data, w, h, { inversionAttempts: "dontInvert" });
+
                         if (code && code.data) {
                             let text = code.data;
                             let ph = text.match(/\b\d{10}\b/);
@@ -827,24 +798,10 @@
                             if (pin) n = n.replace(pin[0], '');
                             pObj.name = n.trim();
                             pObj.status = '✅ QR Found';
+                            toast('QR Code auto-detected!', 'in');
                         } else {
                             pObj.status = '⚠️ No QR';
                         }
-
-                        // 2. Scan Barcode (1D)
-                        try {
-                            const reader = new ZXing.BrowserMultiFormatReader();
-                            const result = await reader.decodeFromCanvas(cvs);
-                            if (result) {
-                                pObj.trackingNumber = result.text;
-                                pObj.courier = detectCourier(result.text);
-                                pObj.bcStatus = `✅ ${pObj.courier}`;
-                                toast(`Barcode detected: ${pObj.trackingNumber}`, 'in');
-                            }
-                        } catch (err) {
-                            pObj.bcStatus = '⚠️ No Barcode';
-                        }
-
                         renderGrid();
                     };
                     img.src = dataUrl;
@@ -862,16 +819,65 @@
             g.innerHTML = pending.map((p, i) => `
     <div class="pc" id="pc-${p.id}">
       <div class="qr-status">${p.status}</div>
-      ${p.bcStatus ? `<div class="bc-badge">${p.bcStatus}</div>` : ''}
       <img src="${p.dataUrl}" alt="">
       <button class="rm" onclick="rmPending('${p.id}')">✕</button>
       <div class="pb">
         <div class="fg"><label>Name</label><input type="text" id="n-${p.id}" placeholder="Customer name" value="${p.name}" oninput="upd('${p.id}','name',this.value)"></div>
         <div class="fg"><label>Pincode</label><input type="text" id="p-${p.id}" placeholder="6-digit pincode" maxlength="6" value="${p.pincode}" oninput="upd('${p.id}','pincode',this.value)"></div>
         <div class="fg"><label>Phone</label><input type="tel" id="ph-${p.id}" placeholder="10-digit phone" maxlength="10" value="${p.phone}" oninput="upd('${p.id}','phone',this.value)"></div>
-        <div class="fg"><label>Tracking #</label><input type="text" id="tn-${p.id}" placeholder="Tracking Number" value="${p.trackingNumber}" oninput="upd('${p.id}','trackingNumber',this.value); upd('${p.id}','courier',detectCourier(this.value));"></div>
       </div>
     </div>`).join('');
+        }
+
+        async function manualScan(id) {
+            const p = pending.find(x => x.id === id);
+            if (!p) return;
+            const imgEl = document.getElementById(`img-${id}`);
+            p.bcStatus = '⏳ Scanning...';
+            renderGrid();
+            
+            const reader = new ZXing.BrowserMultiFormatReader();
+            const hints = new Map();
+            hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+                ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
+                ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.ITF, ZXing.BarcodeFormat.UPC_A
+            ]);
+            hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+
+            // Try rotation & contrast
+            let found = null;
+            const angles = [0, 90, 270, 45, 315];
+            for (let angle of angles) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const w = imgEl.naturalWidth, h = imgEl.naturalHeight;
+                if (angle === 0) {
+                    canvas.width = w; canvas.height = h;
+                    ctx.filter = 'contrast(1.5) grayscale(1)';
+                    ctx.drawImage(imgEl, 0, 0, w, h);
+                } else {
+                    canvas.width = Math.max(w, h); canvas.height = Math.max(w, h);
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(angle * Math.PI / 180);
+                    ctx.filter = 'contrast(1.5) grayscale(1)';
+                    ctx.drawImage(imgEl, -w / 2, -h / 2, w, h);
+                }
+                try {
+                    found = await reader.decodeFromCanvas(canvas, hints);
+                    if (found) break;
+                } catch(e){}
+            }
+
+            if (found) {
+                p.trackingNumber = found.text;
+                p.courier = detectCourier(found.text);
+                p.bcStatus = `✅ ${p.courier}`;
+                toast('Barcode found!', 'ok');
+            } else {
+                p.bcStatus = '❌ Failed';
+                toast('Could not find barcode in this photo.', 'er');
+            }
+            renderGrid();
         }
         function upd(id, f, v) { const p = pending.find(x => x.id === id); if (p) p[f] = v.trim(); }
         function rmPending(id) { pending = pending.filter(p => p.id !== id); renderGrid(); }
@@ -913,17 +919,7 @@
                     const ts = new Date().toISOString();
                     const fname = `${Date.now()}_${p.name.replace(/\s+/g, '_').slice(0, 20)}.jpg`;
                     const url = await uploadImage(fname, p.dataUrl);
-                    const rec = { 
-                        id: p.id, 
-                        name: p.name, 
-                        pincode: p.pincode, 
-                        phone: p.phone, 
-                        trackingNumber: p.trackingNumber || '', 
-                        courier: p.courier || '',
-                        photoUrl: url, 
-                        photoPath: `images/${fname}`, 
-                        uploadedAt: ts 
-                    };
+                    const rec = { id: p.id, name: p.name, pincode: p.pincode, phone: p.phone, photoUrl: url, photoPath: `images/${fname}`, uploadedAt: ts };
                     newRecords.push(rec);
 
                     item.className = 'up-item done';
@@ -984,7 +980,6 @@
       <div class="rinfo">
         <strong>👤 ${r.name}</strong>
         <div class="rmeta">📍 ${r.pincode} &nbsp;|&nbsp; 📞 ${r.phone} &nbsp;|&nbsp; 🕐 ${fmtDate(r.uploadedAt)}</div>
-        ${r.trackingNumber ? `<div class="rmeta" style="color:var(--pl);font-weight:600;">📦 ${r.courier || 'Tracking'}: ${r.trackingNumber}</div>` : ''}
       </div>
       <button class="rdel" onclick="deleteRecord('${r.id}','${r.photoPath || ''}')" title="Delete">🗑</button>
     </div>`).join('');
