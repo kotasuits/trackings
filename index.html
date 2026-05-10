@@ -352,8 +352,8 @@
     }
 
     /* Help Popup */
-    .help-link { display: inline-block; font-size: 0.75rem; color: var(--pl); cursor: pointer; margin-bottom: 4px; text-decoration: underline; opacity: 0.8; transition: opacity 0.2s; text-align: center; width: 100%; }
-    .help-link:hover { opacity: 1; }
+    .help-link { display: block; font-size: 0.7rem; color: var(--pl); cursor: pointer; margin-bottom: 6px; text-decoration: none; opacity: 0.7; transition: all 0.2s; text-align: right; width: 100%; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+    .help-link:hover { opacity: 1; color: #fff; }
     #hmod { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 10001; overflow-y: auto; padding: 40px 10px; flex-direction: column; align-items: center; }
     #hmod.open { display: flex; }
     .hc { margin-top: auto; margin-bottom: auto; background: var(--card); border: 1px solid var(--bdr); border-radius: 24px; padding: 30px; max-width: 400px; width: 100%; position: relative; animation: pop .3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -440,7 +440,6 @@
     <div class="mi">
       <div class="mn" id="mname"></div>
       <div class="mm" id="mmeta"></div>
-      <a id="mdl" class="dlbtn" style="width:100%; justify-content:center; margin-bottom:15px;" download="tracking_photo.jpg">⬇️ Download Photo</a>
       
       <div class="help-link" onclick="openHelp()">Need Help?</div>
       <div class="tlinks">
@@ -448,6 +447,7 @@
         <a href="https://trackon.in/" target="_blank" class="tlink trackon"><span>🚚</span> Trackon</a>
         <a href="https://www.delhivery.com/tracking" target="_blank" class="tlink delhivery"><span>📦</span> Delhivery</a>
       </div>
+      <a id="mdl" class="dlbtn" style="width:100%; justify-content:center; margin-top:15px;" download="tracking_photo.jpg">⬇️ Download Photo</a>
     </div>
   </div>
 
