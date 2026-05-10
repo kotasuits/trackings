@@ -7,7 +7,7 @@
     <title>Tracking Photo Upload</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.1/umd/index.min.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -714,7 +714,7 @@
             
             if (!cfg.repo.includes('/')) {
                 st.className = 'cfg-status bad'; 
-                st.innerHTML = '❌ <b>Invalid Repo Format</b><br>Please use "owner/repo" (e.g., <i>thecraftyriz/thecraftyriz</i>)';
+                st.innerHTML = '❌ <b>Invalid Repo Format</b><br>Please use "owner/repo" (e.g., thecraftyriz/thecraftyriz)';
                 return;
             }
 
@@ -726,7 +726,7 @@
             } catch (e) {
                 console.error('Connection Failed:', e);
                 let help = 'Check your Token and Repository name.';
-                if (e.message.includes('401')) help = 'Invalid Token. Please check your GitHub Personal Access Token.';
+                if (e.message.includes('401')) help = 'Invalid Token. Please check your GitHub PAT.';
                 if (e.message.includes('404')) help = 'Repository not found. Check the owner/repo name.';
                 
                 st.className = 'cfg-status bad'; 
@@ -736,14 +736,7 @@
         }
 
         // ── GitHub API ──
-        function ghHeaders() { 
-            // Support both 'token' and 'Bearer' styles; Bearer is more universal for modern PATs
-            return { 
-                'Authorization': `Bearer ${cfg.token}`, 
-                'Content-Type': 'application/json', 
-                'Accept': 'application/vnd.github.v3+json' 
-            }; 
-        }
+        function ghHeaders() { return { 'Authorization': 'token ' + cfg.token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' }; }
         async function ghGet(path) {
             const r = await fetch(`https://api.github.com/${path}`, { headers: ghHeaders() });
             if (!r.ok) { const e = await r.json(); throw new Error(e.message || r.status); }
@@ -816,7 +809,7 @@
 
                     // Auto-fetch via QR Code
                     const img = new Image();
-                    img.onload = () => {
+                    img.onload = async () => {
                         const cvs = document.createElement('canvas');
                         const ctx = cvs.getContext('2d');
                         let w = img.width, h = img.height;
@@ -841,23 +834,15 @@
                             pObj.status = '✅ QR Found';
                             toast('QR Code auto-detected!', 'in');
                             
-                            // Try to detect courier from QR data if it's a tracking number
                             const c = detectCourier(text);
                             if (c) { pObj.courier = c; pObj.trackingId = text; }
-
                         } else {
                             pObj.status = '⚠️ No QR';
                         }
                         
-                        // Also try Barcode scanning with ZXing
+                        // Barcode Scan
                         try {
                             const reader = new ZXing.BrowserMultiFormatReader();
-                            const hints = new Map();
-                            hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-                                ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
-                                ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.ITF, ZXing.BarcodeFormat.UPC_A
-                            ]);
-                            
                             const bcResult = await reader.decodeFromImageElement(img);
                             if (bcResult) {
                                 pObj.trackingId = bcResult.text;
@@ -865,7 +850,7 @@
                                 pObj.status = '✅ Barcode Found';
                                 toast('Barcode detected!', 'ok');
                             }
-                        } catch(e) {}
+                        } catch(e){}
 
                         renderGrid();
                     };
@@ -904,63 +889,21 @@
     </div>`).join('');
         }
 
-        async function manualScan(id) {
-            const p = pending.find(x => x.id === id);
-            if (!p) return;
-            const imgEl = document.getElementById(`img-${id}`);
-            p.bcStatus = '⏳ Scanning...';
-            renderGrid();
-            
-            const reader = new ZXing.BrowserMultiFormatReader();
-            const hints = new Map();
-            hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-                ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
-                ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.ITF, ZXing.BarcodeFormat.UPC_A
-            ]);
-            hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-
-            // Try rotation & contrast
-            let found = null;
-            const angles = [0, 90, 270, 45, 315];
-            for (let angle of angles) {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const w = imgEl.naturalWidth, h = imgEl.naturalHeight;
-                if (angle === 0) {
-                    canvas.width = w; canvas.height = h;
-                    ctx.filter = 'contrast(1.5) grayscale(1)';
-                    ctx.drawImage(imgEl, 0, 0, w, h);
-                } else {
-                    canvas.width = Math.max(w, h); canvas.height = Math.max(w, h);
-                    ctx.translate(canvas.width / 2, canvas.height / 2);
-                    ctx.rotate(angle * Math.PI / 180);
-                    ctx.filter = 'contrast(1.5) grayscale(1)';
-                    ctx.drawImage(imgEl, -w / 2, -h / 2, w, h);
-                }
-                try {
-                    found = await reader.decodeFromCanvas(canvas, hints);
-                    if (found) break;
-                } catch(e){}
-            }
-
-            if (found) {
-                p.trackingNumber = found.text;
-                p.courier = detectCourier(found.text);
-                p.bcStatus = `✅ ${p.courier}`;
-                toast('Barcode found!', 'ok');
-            } else {
-                p.bcStatus = '❌ Failed';
-                toast('Could not find barcode in this photo.', 'er');
-            }
-            renderGrid();
+        function detectCourier(num) {
+            if (!num) return '';
+            const n = String(num).toUpperCase();
+            if (n.startsWith('D') || n.startsWith('W') || n.startsWith('X') || n.startsWith('U')) return 'DTDC';
+            if (n.startsWith('35') || n.startsWith('19')) return 'Delhivery';
+            if (n.includes('TRACKON')) return 'Trackon';
+            return '';
         }
+
         function upd(id, f, v) { const p = pending.find(x => x.id === id); if (p) p[f] = v.trim(); }
         function rmPending(id) { pending = pending.filter(p => p.id !== id); renderGrid(); }
         function clearPending() { pending = []; renderGrid(); fi.value = ''; document.getElementById('uplog').innerHTML = ''; }
 
         // ── Upload All ──
         async function uploadAll() {
-            // Sync fields
             let ok = true;
             pending.forEach(p => {
                 p.name = (document.getElementById(`n-${p.id}`)?.value || '').trim();
@@ -976,20 +919,15 @@
                 if (!p.courier) { document.getElementById(`c-${p.id}`)?.classList.add('err'); ok = false; }
                 if (!p.trackingId) { document.getElementById(`t-${p.id}`)?.classList.add('err'); ok = false; }
             });
-            if (!ok) { toast('Please fill all fields (Name, Pincode, Phone, Courier, and Tracking ID) for all photos.', 'er'); return; }
+            if (!ok) { toast('Fill all fields (Name, Pincode, Phone, Courier, Tracking ID)', 'er'); return; }
             if (!cfg.token || !cfg.repo) { toast('Save GitHub config first!', 'er'); return; }
 
             const btn = document.getElementById('ubtn');
             btn.disabled = true; btn.textContent = '⏳ Uploading…';
-
             const log = document.getElementById('uplog');
             log.innerHTML = '<div style="font-size:.85rem;color:var(--muted);margin-bottom:8px;">Upload progress:</div>';
 
-
-
-            // Prepare to track new records
             const newRecords = [];
-
             for (let p of pending) {
                 const item = document.createElement('div');
                 item.className = 'up-item going';
@@ -1005,7 +943,6 @@
                         photoUrl: url, photoPath: `images/${fname}`, uploadedAt: ts 
                     };
                     newRecords.push(rec);
-
                     item.className = 'up-item done';
                     item.querySelector('span:last-child').textContent = 'Photo Uploaded ✅';
                 } catch (e) {
@@ -1014,12 +951,11 @@
                 }
             }
 
-            // After all photos are uploaded, update records.json in ONE atomic operation
             if (newRecords.length > 0) {
                 try {
                     const statusItem = document.createElement('div');
                     statusItem.className = 'up-item going';
-                    statusItem.innerHTML = `<span class="up-icon"></span><span class="up-name">Updating database (records.json)</span>`;
+                    statusItem.innerHTML = `<span class="up-icon"></span><span class="up-name">Updating records.json</span>`;
                     log.appendChild(statusItem);
 
                     const { records, sha } = await fetchRecordsJSON();
@@ -1027,10 +963,8 @@
                     await pushRecordsJSON(updatedRecords, sha);
 
                     statusItem.className = 'up-item done';
-                    statusItem.innerHTML = `<span class="up-icon"></span><span class="up-name">Database updated successfully ✅</span>`;
-                } catch (e) {
-                    toast('Failed to update records.json: ' + e.message, 'er');
-                }
+                    statusItem.innerHTML = `<span class="up-icon"></span><span class="up-name">Database updated! ✅</span>`;
+                } catch (e) { toast('Failed to update records.json: ' + e.message, 'er'); }
             }
 
             btn.disabled = false; btn.textContent = '☁️ Upload to GitHub';
@@ -1046,7 +980,6 @@
             if (!cfg.repo) { list.innerHTML = '<div class="empty"><div class="ei">⚙️</div><p>Configure GitHub Repository first.</p></div>'; return; }
             try {
                 let records = [];
-                // If token exists, use API (for latest data), else use raw URL
                 if (cfg.token) {
                     const { records: r } = await fetchRecordsJSON();
                     records = r;
@@ -1056,9 +989,7 @@
                     records = await res.json();
                 }
                 renderRecords(records);
-            } catch (e) {
-                list.innerHTML = `<div class="empty"><div class="ei">❌</div><p>${e.message}</p></div>`;
-            }
+            } catch (e) { list.innerHTML = `<div class="empty"><div class="ei">❌</div><p>${e.message}</p></div>`; }
         }
 
         function renderRecords(records) {
@@ -1073,7 +1004,7 @@
       <div class="rinfo">
         <strong>👤 ${r.name}</strong>
         <div class="rmeta">
-            📍 ${r.pincode} &nbsp;|&nbsp; 📞 ${r.phone} &nbsp;|&nbsp; 🕐 ${fmtDate(r.uploadedAt)}
+            📍 ${r.pincode} | 📞 ${r.phone} | 🕐 ${fmtDate(r.uploadedAt)}
             <br>
             <span style="color:var(--pl);font-weight:600;">🚚 ${r.courier || 'Unknown'}: ${r.trackingId || 'N/A'}</span>
         </div>
@@ -1083,15 +1014,14 @@
         }
 
         async function deleteRecord(id, photoPath) {
-            if (!confirm('Delete this tracking record from GitHub?')) return;
+            if (!confirm('Delete this record?')) return;
             try {
                 const { records, sha } = await fetchRecordsJSON();
                 const updated = records.filter(r => r.id !== id);
                 await pushRecordsJSON(updated, sha);
-                // Optionally delete image file
                 if (photoPath) {
                     const fsha = await getFileSHA(photoPath);
-                    if (fsha) await ghDel(`repos/${cfg.repo}/contents/${photoPath}`, { message: 'Delete photo ' + photoPath, sha: fsha, branch: cfg.branch });
+                    if (fsha) await ghDel(`repos/${cfg.repo}/contents/${photoPath}`, { message: 'Delete photo', sha: fsha, branch: cfg.branch });
                 }
                 toast('Record deleted', 'in');
                 loadRecords();
@@ -1107,16 +1037,6 @@
 
         function openMod(url) { document.getElementById('mimg').src = url; document.getElementById('imod').classList.add('open'); }
         function closeMod() { document.getElementById('imod').classList.remove('open'); document.getElementById('mimg').src = ''; }
-
-        function detectCourier(num) {
-            if (!num) return '';
-            const n = String(num).toUpperCase();
-            if (n.startsWith('D') || n.startsWith('W') || n.startsWith('X') || n.startsWith('U')) return 'DTDC';
-            if (n.startsWith('35') || n.startsWith('19')) return 'Delhivery';
-            if (n.includes('TRACKON')) return 'Trackon';
-            return '';
-        }
-
         document.getElementById('imod').addEventListener('click', e => { if (e.target === document.getElementById('imod')) closeMod(); });
 
         function toast(msg, type = 'ok') {
@@ -1125,7 +1045,6 @@
             setTimeout(() => t.className = '', 3200);
         }
 
-        // ── Init ──
         loadConfig();
         loadRecords();
     </script>
