@@ -18,7 +18,7 @@
     }
     .ph { text-align: center; margin-bottom: 32px; width: 100%; max-width: 940px; }
     .ph h1 { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; background: linear-gradient(135deg, #22d3ee, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .card { background: var(--card); backdrop-filter: blur(18px); border: 1px solid var(--bdr); border-radius: 20px; padding: 26px; width: 100%; max-width: 940px; box-shadow: 0 28px 56px rgba(0,0,0,.35); margin-bottom: 22px; }
+    .card { background: var(--card); backdrop-filter: blur(18px); border: 1px solid var(--bdr); border-radius: 20px; padding: 26px; width: 100%; max-width: 940px; box-shadow: 0 28px 56px rgba(0,0,0,.35); margin-bottom: 22px; position: relative; }
     .sbox { position: relative; margin-bottom: 14px; }
     .sbox .si { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; }
     .sbox input { width: 100%; background: var(--inp); border: 1.5px solid var(--bdr); border-radius: 13px; padding: 14px 16px 14px 48px; color: var(--txt); font-size: 1rem; outline: none; }
@@ -35,22 +35,50 @@
     #imod .mi { background: var(--card); border: 1px solid var(--bdr); border-radius: 15px; padding: 16px 22px; width: 400px; max-width: 90vw; margin-top: 20px; }
     .cm { position: fixed; top: 16px; right: 20px; font-size: 1.4rem; color: #fff; cursor: pointer; background: rgba(255, 255, 255, .1); border: none; border-radius: 50%; width: 40px; height: 40px; }
     .dlbtn { display: inline-flex; align-items: center; gap: 7px; background: var(--primary); color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 9px; font-weight: 600; margin-top: 15px; }
+    .cfg-tip { font-size: 0.7rem; color: var(--muted); text-align: center; margin-top: 10px; cursor: pointer; text-decoration: underline; }
+    #cfg-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--bdr); }
+    .cfg-fld { display: flex; gap: 8px; }
+    .cfg-fld input { flex: 1; background: var(--inp); border: 1px solid var(--bdr); border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 0.8rem; outline: none; }
+    .cfg-fld button { background: var(--primary); border: none; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
   </style>
 </head>
 <body>
   <div class="ph"><h1>🔎 Search Tracking Photos</h1><p>Enter phone number to find your parcel photo.</p></div>
-  <div class="card"><div class="sbox"><span class="si">🔍</span><input type="text" id="si" placeholder="Enter phone number..." oninput="doSearch()"></div></div>
+  <div class="card">
+    <div class="sbox"><span class="si">🔍</span><input type="text" id="si" placeholder="Enter phone number..." oninput="doSearch()"></div>
+    <div id="cfg-tip" class="cfg-tip" onclick="document.getElementById('cfg-box').style.display='block'">⚙️ Repository Settings</div>
+    <div id="cfg-box">
+      <div class="cfg-fld">
+        <input type="text" id="cfg-repo" placeholder="username/repository">
+        <button onclick="saveRepo()">Save</button>
+      </div>
+    </div>
+  </div>
   <div class="card"><div id="rgrid"></div></div>
   <div id="imod"><button class="cm" onclick="closeMod()">✕</button><div class="mw"><img id="mimg" src=""></div><div class="mi"><div class="mn" id="mname"></div><div class="mm" id="mmeta"></div><a id="mdl" href="" download class="dlbtn">💾 Download Photo</a></div></div>
   <script>
-    const OWNER = 'thecraftyriz'; const REPO = 'thecraftyriz'; const PATH = 'records.json';
+    const CFGKEY = 'gh_tracking_config';
     let allRecords = [];
     async function loadData() {
       try {
-        const res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${PATH}?v=${Date.now()}`);
+        const cfg = JSON.parse(localStorage.getItem(CFGKEY) || '{}');
+        const repo = cfg.repo || '';
+        const branch = cfg.branch || 'main';
+        if (!repo) return;
+        document.getElementById('cfg-repo').value = repo;
+        const res = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/records.json?v=${Date.now()}`);
+        if (!res.ok) throw new Error();
         allRecords = await res.json();
         allRecords.reverse();
-      } catch (e) { console.error("Error loading data:", e); }
+      } catch (e) { console.error("Error loading data."); }
+    }
+    function saveRepo() {
+      const r = document.getElementById('cfg-repo').value.trim();
+      if (!r) return;
+      let cfg = JSON.parse(localStorage.getItem(CFGKEY) || '{}');
+      cfg.repo = r;
+      localStorage.setItem(CFGKEY, JSON.stringify(cfg));
+      location.reload();
     }
     function doSearch() {
       const q = document.getElementById('si').value.trim();
@@ -60,10 +88,7 @@
       g.innerHTML = results.map(r => `
         <div class="rc" onclick='openMod(${JSON.stringify(r)})'>
           <img src="${r.photoUrl}" alt="">
-          <div class="ci">
-            <div class="cn">${r.name}</div>
-            <div class="chip">${r.phone}</div><div class="chip">📍 ${r.pincode}</div>
-          </div>
+          <div class="ci"><div class="cn">${r.name}</div><div class="chip">${r.phone}</div><div class="chip">📍 ${r.pincode}</div></div>
         </div>
       `).join('');
     }
