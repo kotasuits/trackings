@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Tracking Status</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script type="text/javascript" src="https://www.17track.net/externalcall.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -26,14 +25,14 @@
             flex-direction: column;
             align-items: center;
         }
-        .container { width: 100%; max-width: 800px; margin-top: 20px; }
+        .container { width: 100%; max-width: 900px; margin-top: 20px; }
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 25px;
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
         }
         .header h1 {
             font-size: 1.5rem;
@@ -54,17 +53,15 @@
             background: rgba(255,255,255,0.05);
             transition: all 0.2s;
         }
-        .back-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-        }
-        #YQContainer {
+        .back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        #tracking-frame {
             width: 100%;
-            min-height: 600px;
+            min-height: 650px;
             border-radius: 15px;
             overflow: hidden;
             background: white;
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border: none;
         }
         .info-card {
             background: var(--card);
@@ -88,14 +85,10 @@
     <div class="container">
         <div class="info-card">
             Tracking Number: <span id="awb-display">Loading...</span><br>
-            <small id="carrier-info" style="color:#64748b;"></small>
+            <small id="carrier-info" style="color:#64748b; margin-top:5px; display:block;"></small>
         </div>
         
-        <div id="YQContainer">
-            <div style="padding:80px 20px; text-align:center; color:#666;">
-                ⌛ Initializing Tracking Service...
-            </div>
-        </div>
+        <iframe id="tracking-frame" src="about:blank"></iframe>
     </div>
 
     <script>
@@ -104,52 +97,43 @@
 
         if (!awb) {
             document.querySelector('.info-card').innerHTML = "❌ No tracking number provided.";
-            document.getElementById('YQContainer').style.display = 'none';
-        } else {
-            document.getElementById('awb-display').textContent = awb;
-
-            // ================== Carrier Detection ==================
-            let carrierCode = "0"; // 0 = auto detect (default)
-            const upperAwb = awb.toUpperCase();
-
-            if (upperAwb.startsWith('D')) {
-                carrierCode = "100069";     // DTDC
-                document.getElementById('carrier-info').textContent = "Carrier: DTDC";
-            } 
-            else if (upperAwb.startsWith('5006')) {
-                carrierCode = "100180";     // Trackon
-                document.getElementById('carrier-info').textContent = "Carrier: Trackon";
-            } 
-            else if (upperAwb.startsWith('356') || upperAwb.startsWith('19')) {
-                carrierCode = "100060";     // Delhivery
-                document.getElementById('carrier-info').textContent = "Carrier: Delhivery";
-            } else {
-                document.getElementById('carrier-info').textContent = "Carrier: Auto Detection";
-            }
-
-            // ================== Initialize 17Track ==================
-            function initTracking() {
-                if (typeof YQV5 !== 'undefined') {
-                    document.getElementById('YQContainer').innerHTML = '';
-
-                    YQV5.trackSingle({
-                        YQ_ContainerId: "YQContainer",
-                        YQ_Height: 600,
-                        YQ_Lang: "en",
-                        YQ_Num: awb,
-                        YQ_Fc: carrierCode   // Specific carrier or 0 for auto
-                    });
-                } else {
-                    setTimeout(initTracking, 400);
-                }
-            }
-
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initTracking);
-            } else {
-                initTracking();
-            }
+            return;
         }
+
+        document.getElementById('awb-display').textContent = awb;
+        const frame = document.getElementById('tracking-frame');
+
+        let carrierName = "Auto";
+        let url = "";
+
+        const upper = awb.toUpperCase();
+
+        if (upper.startsWith('D')) {
+            carrierName = "DTDC";
+            url = `https://www.dtdc.in/tracking.asp?track=${awb}`;
+        } 
+        else if (upper.startsWith('5006')) {
+            carrierName = "Trackon";
+            url = `https://www.trackon.in/track-shipment?awbno=${awb}`;
+        } 
+        else if (upper.startsWith('356') || upper.startsWith('19')) {
+            carrierName = "Delhivery";
+            url = `https://www.delhivery.com/track/package/${awb}`;
+        } 
+        else if (upper.startsWith('B')) {
+            carrierName = "Bluedart";
+            url = `https://www.bluedart.com/web/guest/trackdart-result?trackNo=${awb}`;
+        } 
+        else {
+            // Fallback to 17Track
+            carrierName = "17Track (Multi-Carrier)";
+            frame.src = `https://www.17track.net/en/track?nums=${awb}`;
+            document.getElementById('carrier-info').textContent = "Carrier: Multi Carrier Detection";
+            return;
+        }
+
+        document.getElementById('carrier-info').textContent = `Carrier: ${carrierName}`;
+        frame.src = url;
     </script>
 </body>
 </html>
