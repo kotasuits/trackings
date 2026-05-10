@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Tracking - Track24</title>
+    <title>Live Tracking</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,12 +13,7 @@
             --txt: #f1f5f9;
             --muted: #94a3b8;
         }
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Outfit', sans-serif; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
         body {
             background: var(--bg);
             background-image: radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, .15), transparent 60%);
@@ -29,11 +24,7 @@
             flex-direction: column;
             align-items: center;
         }
-        .container {
-            width: 100%;
-            max-width: 960px;
-            margin-top: 20px;
-        }
+        .container { width: 100%; max-width: 980px; margin-top: 20px; }
         .header {
             display: flex;
             align-items: center;
@@ -42,7 +33,7 @@
             width: 100%;
         }
         .header h1 {
-            font-size: 1.65rem;
+            font-size: 1.7rem;
             background: linear-gradient(135deg, #818cf8, #22d3ee);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -60,10 +51,8 @@
             background: rgba(255,255,255,0.05);
             transition: all 0.3s;
         }
-        .back-btn:hover {
-            background: rgba(255,255,255,0.15);
-            color: white;
-        }
+        .back-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+
         .info-card {
             background: var(--card);
             border: 1px solid rgba(255,255,255,0.1);
@@ -72,24 +61,21 @@
             margin-bottom: 25px;
             text-align: center;
         }
-        .info-card span { 
-            color: var(--primary); 
-            font-weight: 700; 
-            font-size: 1.2rem; 
-        }
-        #track24-frame {
+        .info-card span { color: var(--primary); font-weight: 700; font-size: 1.2rem; }
+
+        #track-frame {
             width: 100%;
-            min-height: 700px;
+            min-height: 720px;
             border-radius: 16px;
             background: white;
             box-shadow: 0 25px 65px rgba(0,0,0,0.5);
             border: none;
         }
         .loading {
-            padding: 140px 20px;
+            padding: 160px 20px;
             text-align: center;
             color: #64748b;
-            font-size: 1.15rem;
+            font-size: 1.2rem;
         }
     </style>
 </head>
@@ -108,33 +94,26 @@
         </div>
         
         <div id="loading" class="loading">
-            ⌛ Loading Tracking Information...
+            ⌛ Loading Tracking Information from Track24...
         </div>
         
-        <iframe id="track24-frame" 
-                src="about:blank" 
-                frameborder="0" 
-                allowfullscreen>
-        </iframe>
+        <iframe id="track-frame" src="about:blank" frameborder="0" allowfullscreen></iframe>
     </div>
 
     <script>
-        // Get tracking number from URL (?awb=xxxxxxxx)
         const params = new URLSearchParams(window.location.search);
         const awb = params.get('awb')?.trim();
 
         if (!awb) {
             document.querySelector('.info-card').innerHTML = 
-                `<strong style="color:#ef4444;">❌ No tracking number provided.<br><br>Use this format:<br>?awb=YOURTRACKINGNUMBER</strong>`;
+                `<strong style="color:#ef4444;">❌ No tracking number provided.<br><br>Example: ?awb=500612345678</strong>`;
             document.getElementById('loading').style.display = 'none';
         } else {
-            // Display AWB
             document.getElementById('awb-display').textContent = awb;
 
-            // Carrier hint for Indian users
+            // Carrier hint
             const upper = awb.toUpperCase();
             let carrier = "Multiple Couriers";
-
             if (upper.startsWith('D')) carrier = "DTDC";
             else if (upper.startsWith('5006')) carrier = "Trackon";
             else if (upper.startsWith('356') || upper.startsWith('19')) carrier = "Delhivery";
@@ -142,11 +121,10 @@
 
             document.getElementById('carrier-info').textContent = `Carrier: ${carrier}`;
 
-            // Load Track24 Widget
-            const frame = document.getElementById('track24-frame');
-            frame.src = `https://track24.net/forms/widget/?num=${encodeURIComponent(awb)}`;
+            // Load Track24 Tracking Page
+            const frame = document.getElementById('track-frame');
+            frame.src = `https://track24.net/?num=${encodeURIComponent(awb)}`;
 
-            // Hide loading when widget loads
             frame.onload = () => {
                 document.getElementById('loading').style.display = 'none';
             };
