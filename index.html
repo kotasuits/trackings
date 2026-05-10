@@ -22,7 +22,7 @@
     .card { background: var(--card); backdrop-filter: blur(18px); border: 1px solid var(--bdr); border-radius: 20px; padding: 26px; width: 100%; max-width: 940px; box-shadow: 0 28px 56px rgba(0,0,0,.35); margin-bottom: 22px; position: relative; }
     
     /* Search Box */
-    .sbox { position: relative; margin-bottom: 14px; }
+    .sbox { position: relative; }
     .sbox .si { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; }
     .sbox input { width: 100%; background: var(--inp); border: 1.5px solid var(--bdr); border-radius: 13px; padding: 14px 16px 14px 48px; color: var(--txt); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; }
     .sbox input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, .2); }
@@ -42,8 +42,11 @@
     .vo span { background: rgba(0, 0, 0, .72); color: #fff; padding: 7px 18px; border-radius: 20px; font-weight: 600; font-size: .88rem; opacity: 0; transform: scale(.85); transition: opacity .25s, transform .25s; }
     .rc:hover .vo span { opacity: 1; transform: scale(1); }
     
+    /* Error Banner */
+    #err-banner { display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.9rem; }
+    
     /* Help Popup */
-    .help-link { display: inline-block; font-size: 0.75rem; color: var(--pl); cursor: pointer; margin-bottom: 12px; text-decoration: underline; opacity: 0.8; transition: opacity 0.2s; }
+    .help-link { display: inline-block; font-size: 0.8rem; color: var(--pl); cursor: pointer; margin-bottom: 12px; text-decoration: underline; opacity: 0.8; transition: opacity 0.2s; text-align: center; width: 100%; }
     .help-link:hover { opacity: 1; }
     #hmod { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 10001; overflow-y: auto; padding: 40px 10px; flex-direction: column; align-items: center; }
     #hmod.open { display: flex; }
@@ -58,10 +61,10 @@
     .close-h:hover { background: rgba(255, 255, 255, 0.2); }
 
     /* Tracking Links */
-    .tlinks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--bdr); }
-    .tlink { display: flex; flex-direction: column; align-items: center; gap: 8px; background: rgba(99, 102, 241, 0.08); border: 1.5px solid rgba(99, 102, 241, 0.2); color: #fff; padding: 14px 10px; border-radius: 14px; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
-    .tlink span { font-size: 1.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-    .tlink:hover { background: var(--primary); border-color: var(--pl); transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 24px rgba(99, 102, 241, 0.35); }
+    .tlinks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+    .tlink { display: flex; flex-direction: column; align-items: center; gap: 6px; background: rgba(99, 102, 241, 0.08); border: 1.5px solid rgba(99, 102, 241, 0.2); color: #fff; padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-decoration: none; transition: all 0.3s; }
+    .tlink span { font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+    .tlink:hover { background: var(--primary); border-color: var(--pl); transform: translateY(-2px); }
     .tlink.dtdc { border-color: rgba(250, 204, 21, 0.4); background: rgba(250, 204, 21, 0.1); }
     .tlink.trackon { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); }
     .tlink.delhivery { border-color: rgba(34, 211, 238, 0.4); background: rgba(34, 211, 238, 0.1); }
@@ -69,26 +72,20 @@
     .tlink.trackon:hover { background: #ef4444; color: #fff; border-color: #fca5a5; }
     .tlink.delhivery:hover { background: #06b6d4; color: #fff; border-color: #67e8f9; }
     
-    @media(max-width:580px) {
-      .tlinks { grid-template-columns: 1fr 1fr; }
-      .tlink { padding: 10px 6px; font-size: 0.8rem; }
-      .tlink span { font-size: 1.3rem; }
-    }
-    @media(max-width:400px) {
-      .tlinks { grid-template-columns: 1fr; }
-    }
+    @media(max-width:580px) { .tlinks { grid-template-columns: 1fr 1fr; } }
+    @media(max-width:400px) { .tlinks { grid-template-columns: 1fr; } }
 
     /* Modal */
     #imod { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .92); z-index: 10000; overflow-y: auto; padding: 60px 10px; flex-direction: column; align-items: center; }
     #imod.open { display: flex; }
     #imod .mw { max-width: 90vw; margin-bottom: 18px; margin-top: auto; flex-shrink: 0; }
-    #imod .mw img { max-width: 100%; max-height: 72vh; border-radius: 13px; box-shadow: 0 18px 55px rgba(0, 0, 0, .6); display: block; }
+    #imod .mw img { max-width: 100%; max-height: 55vh; border-radius: 13px; box-shadow: 0 18px 55px rgba(0, 0, 0, .6); display: block; margin: 0 auto; }
     #imod .mi { background: rgba(20, 30, 55, .96); border: 1px solid var(--bdr); border-radius: 15px; padding: 16px 22px; width: 400px; max-width: 90vw; margin-bottom: auto; flex-shrink: 0; }
     #imod .mi .mn { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
-    #imod .mi .mm { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    #imod .mi .mm { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
     .cm { position: fixed; top: 16px; right: 20px; font-size: 1.4rem; color: #fff; cursor: pointer; background: rgba(255, 255, 255, .12); border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; transition: background .2s; }
     .cm:hover { background: rgba(255, 255, 255, .26); }
-    .dlbtn { display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; text-decoration: none; padding: 9px 20px; border-radius: 9px; font-weight: 600; font-size: .88rem; transition: all .2s; }
+    .dlbtn { display: inline-flex; align-items: center; justify-content: center; width: 100%; gap: 7px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; text-decoration: none; padding: 10px; border-radius: 9px; font-weight: 600; font-size: .88rem; transition: all .2s; margin-bottom: 15px; }
     .dlbtn:hover { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(99, 102, 241, .5); }
   </style>
 </head>
@@ -99,20 +96,7 @@
   </div>
 
   <div class="card">
-    <div class="help-link" onclick="openHelp()">❓ Need help identifying courier?</div>
-    
-    <div class="tlinks">
-      <a href="https://www.dtdc.in/tracking/shipment-tracking.asp" target="_blank" class="tlink dtdc">
-        <span>🚛</span> DTDC
-      </a>
-      <a href="https://trackon.in/" target="_blank" class="tlink trackon">
-        <span>🚚</span> Trackon
-      </a>
-      <a href="https://www.delhivery.com/tracking" target="_blank" class="tlink delhivery">
-        <span>📦</span> Delhivery
-      </a>
-    </div>
-
+    <div id="err-banner"></div>
     <div class="sbox"><span class="si">🔍</span><input type="text" id="si" placeholder="Please enter phone number to find tracking..." oninput="doSearch()" autocomplete="off" autofocus></div>
   </div>
 
@@ -126,34 +110,24 @@
     <div class="mi">
       <div class="mn" id="mname"></div>
       <div class="mm" id="mmeta"></div>
+      
       <a id="mdl" href="" download class="dlbtn">💾 Download Photo</a>
+      
+      <div class="help-link" onclick="openHelp()">❓ Need help identifying courier?</div>
+      <div class="tlinks">
+        <a href="https://www.dtdc.in/tracking/shipment-tracking.asp" target="_blank" class="tlink dtdc"><span>🚛</span> DTDC</a>
+        <a href="https://trackon.in/" target="_blank" class="tlink trackon"><span>🚚</span> Trackon</a>
+        <a href="https://www.delhivery.com/tracking" target="_blank" class="tlink delhivery"><span>📦</span> Delhivery</a>
+      </div>
     </div>
   </div>
 
   <div id="hmod">
     <div class="hc">
       <h2>💡 Tracking Guide</h2>
-      <div class="gi">
-        <span class="icon">🚛</span>
-        <div>
-          <b>DTDC Courier</b>
-          <p>Tracking numbers for DTDC usually start with <strong>D, W, X, or U</strong>.</p>
-        </div>
-      </div>
-      <div class="gi">
-        <span class="icon">🚚</span>
-        <div>
-          <b>Trackon Courier</b>
-          <p>The company name is clearly mentioned on the label in the photo.</p>
-        </div>
-      </div>
-      <div class="gi">
-        <span class="icon">📦</span>
-        <div>
-          <b>Delhivery Courier</b>
-          <p>Tracking numbers for Delhivery usually start with <strong>'356' or '19'</strong>.</p>
-        </div>
-      </div>
+      <div class="gi"><span class="icon">🚛</span><div><b>DTDC Courier</b><p>Tracking numbers for DTDC usually start with <strong>D, W, X, or U</strong>.</p></div></div>
+      <div class="gi"><span class="icon">🚚</span><div><b>Trackon Courier</b><p>The company name is clearly mentioned on the label in the photo.</p></div></div>
+      <div class="gi"><span class="icon">📦</span><div><b>Delhivery Courier</b><p>Tracking numbers for Delhivery usually start with <strong>'356' or '19'</strong>.</p></div></div>
       <button class="close-h" onclick="closeHelp()">Got it!</button>
     </div>
   </div>
@@ -168,13 +142,29 @@
 
     async function loadData() {
       try {
-        const res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${PATH}?v=${Date.now()}`);
-        if (!res.ok) throw new Error("Could not fetch records");
+        const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${PATH}?v=${Date.now()}`;
+        const res = await fetch(url);
+        
+        if (!res.ok) {
+          if (res.status === 404) {
+            showError("❌ Error 404: Photos not fetching because the GitHub Repository is PRIVATE. <br><br><b>How to fix:</b> Go to your GitHub Repository Settings (thecraftyriz/thecraftyriz) -> General -> Danger Zone -> Change visibility to <b>Public</b>. Without a token, raw.githubusercontent.com cannot read private files.");
+          } else {
+            showError(`❌ Error ${res.status}: Failed to fetch tracking data.`);
+          }
+          return;
+        }
+        
         allRecords = await res.json();
         allRecords.reverse();
       } catch (e) {
-        console.error("Error loading data:", e);
+        showError("❌ Network error: Could not connect to the database.");
       }
+    }
+
+    function showError(msg) {
+      const b = document.getElementById('err-banner');
+      b.innerHTML = msg;
+      b.style.display = 'block';
     }
 
     function doSearch() {
