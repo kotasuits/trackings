@@ -17,113 +17,203 @@
       background-image: radial-gradient(ellipse at 80% 0%, rgba(34, 211, 238, .15), transparent 50%), radial-gradient(ellipse at 10% 100%, rgba(99, 102, 241, .15), transparent 50%);
     }
     .ph { text-align: center; margin-bottom: 32px; width: 100%; max-width: 940px; }
-    .ph h1 { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; background: linear-gradient(135deg, #22d3ee, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .ph h1 { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; background: linear-gradient(135deg, #22d3ee, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px; }
+    .ph p { color: var(--muted); }
     .card { background: var(--card); backdrop-filter: blur(18px); border: 1px solid var(--bdr); border-radius: 20px; padding: 26px; width: 100%; max-width: 940px; box-shadow: 0 28px 56px rgba(0,0,0,.35); margin-bottom: 22px; position: relative; }
+    
+    /* Search Box */
     .sbox { position: relative; margin-bottom: 14px; }
     .sbox .si { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; }
-    .sbox input { width: 100%; background: var(--inp); border: 1.5px solid var(--bdr); border-radius: 13px; padding: 14px 16px 14px 48px; color: var(--txt); font-size: 1rem; outline: none; }
+    .sbox input { width: 100%; background: var(--inp); border: 1.5px solid var(--bdr); border-radius: 13px; padding: 14px 16px 14px 48px; color: var(--txt); font-size: 1rem; outline: none; transition: border-color .25s, box-shadow .25s; }
     .sbox input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, .2); }
+    
+    /* Results Grid */
     #rgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
-    .rc { background: rgba(10, 15, 35, .72); border: 1px solid var(--bdr); border-radius: 15px; overflow: hidden; cursor: pointer; transition: transform .2s; }
-    .rc:hover { transform: translateY(-4px); border-color: var(--pl); }
-    .rc img { width: 100%; height: 175px; object-fit: cover; }
+    .rc { background: rgba(10, 15, 35, .72); border: 1px solid var(--bdr); border-radius: 15px; overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s; position: relative; }
+    .rc:hover { transform: translateY(-4px); box-shadow: 0 14px 38px rgba(99, 102, 241, .22); border-color: rgba(99, 102, 241, .4); }
+    .rc img { width: 100%; height: 175px; object-fit: cover; display: block; }
     .rc .ci { padding: 13px 15px; }
     .rc .cn { font-weight: 700; font-size: .95rem; margin-bottom: 5px; }
-    .chip { background: rgba(99, 102, 241, .12); color: var(--pl); padding: 3px 9px; border-radius: 20px; font-size: .75rem; font-weight: 600; margin-right: 5px; }
-    #imod { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .92); z-index: 10000; overflow-y: auto; padding: 60px 10px; flex-direction: column; align-items: center; }
-    #imod.open { display: flex; }
-    #imod .mw img { max-width: 100%; max-height: 72vh; border-radius: 13px; }
-    #imod .mi { background: var(--card); border: 1px solid var(--bdr); border-radius: 15px; padding: 16px 22px; width: 400px; max-width: 90vw; margin-top: 20px; }
-    .cm { position: fixed; top: 16px; right: 20px; font-size: 1.4rem; color: #fff; cursor: pointer; background: rgba(255, 255, 255, .1); border: none; border-radius: 50%; width: 40px; height: 40px; }
-    .dlbtn { display: inline-flex; align-items: center; gap: 7px; background: var(--primary); color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 9px; font-weight: 600; margin-top: 15px; }
-    .cfg-tip { font-size: 0.7rem; color: var(--muted); text-align: center; margin-top: 10px; cursor: pointer; text-decoration: underline; }
-    #cfg-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--bdr); }
-    .cfg-fld { display: flex; gap: 8px; }
-    .cfg-fld input { flex: 1; background: var(--inp); border: 1px solid var(--bdr); border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 0.8rem; outline: none; }
-    .cfg-fld button { background: var(--primary); border: none; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
-    .help-link { display: inline-block; font-size: 0.75rem; color: var(--pl); cursor: pointer; margin-bottom: 8px; text-decoration: underline; opacity: 0.8; transition: opacity 0.2s; }
+    .rc .ml { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { background: rgba(99, 102, 241, .12); border: 1px solid rgba(99, 102, 241, .2); color: var(--pl); padding: 3px 9px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .chip.ph { background: rgba(34, 211, 238, .1); border-color: rgba(34, 211, 238, .25); color: #67e8f9; }
+    .vo { position: absolute; inset: 0; height: 175px; background: rgba(99, 102, 241, 0); display: flex; align-items: center; justify-content: center; transition: background .25s; }
+    .rc:hover .vo { background: rgba(99, 102, 241, .22); }
+    .vo span { background: rgba(0, 0, 0, .72); color: #fff; padding: 7px 18px; border-radius: 20px; font-weight: 600; font-size: .88rem; opacity: 0; transform: scale(.85); transition: opacity .25s, transform .25s; }
+    .rc:hover .vo span { opacity: 1; transform: scale(1); }
+    
+    /* Help Popup */
+    .help-link { display: inline-block; font-size: 0.75rem; color: var(--pl); cursor: pointer; margin-bottom: 12px; text-decoration: underline; opacity: 0.8; transition: opacity 0.2s; }
     .help-link:hover { opacity: 1; }
     #hmod { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 10001; overflow-y: auto; padding: 40px 10px; flex-direction: column; align-items: center; }
     #hmod.open { display: flex; }
-    .hc { margin-top: auto; margin-bottom: auto; background: var(--card); border: 1px solid var(--bdr); border-radius: 24px; padding: 30px; max-width: 400px; width: 100%; position: relative; }
-    .hc h2 { margin-bottom: 20px; font-size: 1.5rem; color: #fff; }
+    .hc { margin-top: auto; margin-bottom: auto; background: var(--card); border: 1px solid var(--bdr); border-radius: 24px; padding: 30px; max-width: 400px; width: 100%; position: relative; animation: pop .3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes pop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+    .hc h2 { margin-bottom: 20px; font-size: 1.5rem; color: #fff; background: linear-gradient(135deg, #fff, var(--pl)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .gi { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 18px; }
-    .gi .icon { font-size: 1.6rem; }
+    .gi .icon { font-size: 1.6rem; flex-shrink: 0; }
     .gi div b { display: block; color: var(--pl); margin-bottom: 3px; }
     .gi div p { font-size: 0.9rem; color: var(--muted); line-height: 1.4; }
-    .close-h { background: rgba(255, 255, 255, 0.1); border: none; color: #fff; width: 100%; padding: 12px; border-radius: 12px; margin-top: 10px; cursor: pointer; font-weight: 600; }
+    .close-h { background: rgba(255, 255, 255, 0.1); border: none; color: #fff; width: 100%; padding: 12px; border-radius: 12px; margin-top: 10px; cursor: pointer; font-weight: 600; transition: background .2s; }
+    .close-h:hover { background: rgba(255, 255, 255, 0.2); }
+
+    /* Tracking Links */
+    .tlinks { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--bdr); }
+    .tlink { display: flex; flex-direction: column; align-items: center; gap: 8px; background: rgba(99, 102, 241, 0.08); border: 1.5px solid rgba(99, 102, 241, 0.2); color: #fff; padding: 14px 10px; border-radius: 14px; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+    .tlink span { font-size: 1.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+    .tlink:hover { background: var(--primary); border-color: var(--pl); transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 24px rgba(99, 102, 241, 0.35); }
+    .tlink.dtdc { border-color: rgba(250, 204, 21, 0.4); background: rgba(250, 204, 21, 0.1); }
+    .tlink.trackon { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); }
+    .tlink.delhivery { border-color: rgba(34, 211, 238, 0.4); background: rgba(34, 211, 238, 0.1); }
+    .tlink.dtdc:hover { background: #eab308; color: #000; border-color: #fef08a; }
+    .tlink.trackon:hover { background: #ef4444; color: #fff; border-color: #fca5a5; }
+    .tlink.delhivery:hover { background: #06b6d4; color: #fff; border-color: #67e8f9; }
+    
+    @media(max-width:580px) {
+      .tlinks { grid-template-columns: 1fr 1fr; }
+      .tlink { padding: 10px 6px; font-size: 0.8rem; }
+      .tlink span { font-size: 1.3rem; }
+    }
+    @media(max-width:400px) {
+      .tlinks { grid-template-columns: 1fr; }
+    }
+
+    /* Modal */
+    #imod { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .92); z-index: 10000; overflow-y: auto; padding: 60px 10px; flex-direction: column; align-items: center; }
+    #imod.open { display: flex; }
+    #imod .mw { max-width: 90vw; margin-bottom: 18px; margin-top: auto; flex-shrink: 0; }
+    #imod .mw img { max-width: 100%; max-height: 72vh; border-radius: 13px; box-shadow: 0 18px 55px rgba(0, 0, 0, .6); display: block; }
+    #imod .mi { background: rgba(20, 30, 55, .96); border: 1px solid var(--bdr); border-radius: 15px; padding: 16px 22px; width: 400px; max-width: 90vw; margin-bottom: auto; flex-shrink: 0; }
+    #imod .mi .mn { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+    #imod .mi .mm { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .cm { position: fixed; top: 16px; right: 20px; font-size: 1.4rem; color: #fff; cursor: pointer; background: rgba(255, 255, 255, .12); border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+    .cm:hover { background: rgba(255, 255, 255, .26); }
+    .dlbtn { display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; text-decoration: none; padding: 9px 20px; border-radius: 9px; font-weight: 600; font-size: .88rem; transition: all .2s; }
+    .dlbtn:hover { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(99, 102, 241, .5); }
   </style>
 </head>
 <body>
-  <div class="ph"><h1>🔎 Search Tracking Photos</h1><p>Enter phone number to find your parcel photo.</p></div>
+  <div class="ph">
+    <h1>🔎 Search Tracking Photos</h1>
+    <p>Please enter your phone number to find your tracking photo.</p>
+  </div>
+
   <div class="card">
     <div class="help-link" onclick="openHelp()">❓ Need help identifying courier?</div>
-    <div class="sbox"><span class="si">🔍</span><input type="text" id="si" placeholder="Enter phone number..." oninput="doSearch()"></div>
-    <div id="cfg-tip" class="cfg-tip" onclick="document.getElementById('cfg-box').style.display='block'">⚙️ Repository Settings</div>
-    <div id="cfg-box">
-      <div class="cfg-fld">
-        <input type="text" id="cfg-repo" placeholder="username/repository">
-        <button onclick="saveRepo()">Save</button>
-      </div>
+    
+    <div class="tlinks">
+      <a href="https://www.dtdc.in/tracking/shipment-tracking.asp" target="_blank" class="tlink dtdc">
+        <span>🚛</span> DTDC
+      </a>
+      <a href="https://trackon.in/" target="_blank" class="tlink trackon">
+        <span>🚚</span> Trackon
+      </a>
+      <a href="https://www.delhivery.com/tracking" target="_blank" class="tlink delhivery">
+        <span>📦</span> Delhivery
+      </a>
+    </div>
+
+    <div class="sbox"><span class="si">🔍</span><input type="text" id="si" placeholder="Please enter phone number to find tracking..." oninput="doSearch()" autocomplete="off" autofocus></div>
+  </div>
+
+  <div class="card">
+    <div id="rgrid"></div>
+  </div>
+
+  <div id="imod">
+    <button class="cm" onclick="closeMod()">✕</button>
+    <div class="mw"><img id="mimg" src="" alt=""></div>
+    <div class="mi">
+      <div class="mn" id="mname"></div>
+      <div class="mm" id="mmeta"></div>
+      <a id="mdl" href="" download class="dlbtn">💾 Download Photo</a>
     </div>
   </div>
-  <div class="card"><div id="rgrid"></div></div>
-  <div id="imod"><button class="cm" onclick="closeMod()">✕</button><div class="mw"><img id="mimg" src=""></div><div class="mi"><div class="mn" id="mname"></div><div class="mm" id="mmeta"></div><a id="mdl" href="" download class="dlbtn">💾 Download Photo</a></div></div>
+
   <div id="hmod">
     <div class="hc">
       <h2>💡 Tracking Guide</h2>
-      <div class="gi"><span class="icon">🚛</span><div><b>DTDC Courier</b><p>Tracking numbers usually start with <b>D, W, X, or U</b>.</p></div></div>
-      <div class="gi"><span class="icon">🚚</span><div><b>Trackon Courier</b><p>The company name is usually mentioned on the label.</p></div></div>
-      <div class="gi"><span class="icon">📦</span><div><b>Delhivery Courier</b><p>Tracking numbers usually start with <b>'19' or '35'</b>.</p></div></div>
+      <div class="gi">
+        <span class="icon">🚛</span>
+        <div>
+          <b>DTDC Courier</b>
+          <p>Tracking numbers for DTDC usually start with <strong>D, W, X, or U</strong>.</p>
+        </div>
+      </div>
+      <div class="gi">
+        <span class="icon">🚚</span>
+        <div>
+          <b>Trackon Courier</b>
+          <p>The company name is clearly mentioned on the label in the photo.</p>
+        </div>
+      </div>
+      <div class="gi">
+        <span class="icon">📦</span>
+        <div>
+          <b>Delhivery Courier</b>
+          <p>Tracking numbers for Delhivery usually start with <strong>'356' or '19'</strong>.</p>
+        </div>
+      </div>
       <button class="close-h" onclick="closeHelp()">Got it!</button>
     </div>
   </div>
+
   <script>
-    const CFGKEY = 'gh_tracking_config';
+    // Hardcoded repository config (no token required)
+    const OWNER = 'thecraftyriz';
+    const REPO = 'thecraftyriz';
+    const PATH = 'records.json';
+    
     let allRecords = [];
+
     async function loadData() {
       try {
-        const cfg = JSON.parse(localStorage.getItem(CFGKEY) || '{}');
-        const repo = cfg.repo || '';
-        const branch = cfg.branch || 'main';
-        if (!repo) return;
-        document.getElementById('cfg-repo').value = repo;
-        const res = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/records.json?v=${Date.now()}`);
-        if (!res.ok) throw new Error();
+        const res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${PATH}?v=${Date.now()}`);
+        if (!res.ok) throw new Error("Could not fetch records");
         allRecords = await res.json();
         allRecords.reverse();
-      } catch (e) { console.error("Error loading data."); }
+      } catch (e) {
+        console.error("Error loading data:", e);
+      }
     }
-    function saveRepo() {
-      const r = document.getElementById('cfg-repo').value.trim();
-      if (!r) return;
-      let cfg = JSON.parse(localStorage.getItem(CFGKEY) || '{}');
-      cfg.repo = r;
-      localStorage.setItem(CFGKEY, JSON.stringify(cfg));
-      location.reload();
-    }
+
     function doSearch() {
       const q = document.getElementById('si').value.trim();
       const g = document.getElementById('rgrid');
       if (!q) { g.innerHTML = ''; return; }
+      
       const results = allRecords.filter(r => r.phone && r.phone.includes(q));
       g.innerHTML = results.map(r => `
         <div class="rc" onclick='openMod(${JSON.stringify(r)})'>
           <img src="${r.photoUrl}" alt="">
-          <div class="ci"><div class="cn">${r.name}</div><div class="chip">${r.phone}</div><div class="chip">📍 ${r.pincode}</div></div>
+          <div class="vo"><span>View Photo</span></div>
+          <div class="ci">
+            <div class="cn">${r.name}</div>
+            <div class="ml">
+              <span class="chip ph">${r.phone}</span>
+              <span class="chip">📍 ${r.pincode}</span>
+            </div>
+          </div>
         </div>
       `).join('');
     }
+
     function openMod(r) {
       document.getElementById('mimg').src = r.photoUrl;
       document.getElementById('mname').textContent = r.name;
-      document.getElementById('mmeta').innerHTML = `<span class="chip">${r.phone}</span><span class="chip">📍 ${r.pincode}</span>`;
+      document.getElementById('mmeta').innerHTML = `<span class="chip ph">${r.phone}</span><span class="chip">📍 ${r.pincode}</span>`;
       document.getElementById('mdl').href = r.photoUrl;
       document.getElementById('imod').classList.add('open');
     }
-    function closeMod() { document.getElementById('imod').classList.remove('open'); }
+
+    function closeMod() { document.getElementById('imod').classList.remove('open'); document.getElementById('mimg').src = ''; }
     function openHelp() { document.getElementById('hmod').classList.add('open'); }
     function closeHelp() { document.getElementById('hmod').classList.remove('open'); }
+    
+    document.getElementById('imod').addEventListener('click', e => { if (e.target === document.getElementById('imod')) closeMod(); });
+    document.getElementById('hmod').addEventListener('click', e => { if (e.target === document.getElementById('hmod')) closeHelp(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeMod(); closeHelp(); } });
+
     loadData();
   </script>
 </body>
