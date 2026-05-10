@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,348 +7,75 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #6366f1;
-      --pl: #818cf8;
-      --bg: #0a0f1e;
-      --card: rgba(20, 30, 55, .78);
-      --inp: rgba(10, 15, 35, .7);
-      --txt: #f1f5f9;
-      --muted: #94a3b8;
-      --bdr: rgba(255, 255, 255, .09);
+      --primary: #6366f1; --pl: #818cf8; --bg: #0a0f1e; --card: rgba(20, 30, 55, .78);
+      --inp: rgba(10, 15, 35, .7); --txt: #f1f5f9; --muted: #94a3b8; --bdr: rgba(255, 255, 255, .09);
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Outfit', sans-serif;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
     body {
-      background: var(--bg);
+      background: var(--bg); color: var(--txt); min-height: 100vh; padding: 28px 16px 60px;
+      display: flex; flex-direction: column; align-items: center;
       background-image: radial-gradient(ellipse at 80% 0%, rgba(34, 211, 238, .15), transparent 50%), radial-gradient(ellipse at 10% 100%, rgba(99, 102, 241, .15), transparent 50%);
-      color: var(--txt);
-      min-height: 100vh;
-      padding: 28px 16px 60px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
-
-    .ph {
-      text-align: center;
-      margin-bottom: 32px;
-      width: 100%;
-      max-width: 940px;
-    }
-
-    .ph h1 {
-      font-size: clamp(1.6rem, 4vw, 2.6rem);
-      font-weight: 700;
-      background: linear-gradient(135deg, #22d3ee, #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 6px;
-    }
-
-    .ph p {
-      color: var(--muted);
-    }
-
-    .card {
-      background: var(--card);
-      backdrop-filter: blur(18px);
-      border: 1px solid var(--bdr);
-      border-radius: 20px;
-      padding: 26px;
-      width: 100%;
-      max-width: 940px;
-      box-shadow: 0 28px 56px rgba(0, 0, 0, .35);
-      margin-bottom: 22px;
-    }
-
-    /* Search */
-    .sbox {
-      position: relative;
-      margin-bottom: 14px;
-    }
-
-    .sbox .si {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.1rem;
-      pointer-events: none;
-    }
-
-    .sbox input {
-      width: 100%;
-      background: var(--inp);
-      border: 1.5px solid var(--bdr);
-      border-radius: 13px;
-      padding: 14px 16px 14px 48px;
-      color: var(--txt);
-      font-size: 1rem;
-      outline: none;
-      transition: border-color .25s, box-shadow .25s;
-    }
-
-    .sbox input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, .2);
-    }
-
-    /* Results grid */
-    #rgrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 18px;
-    }
-
-    .rc {
-      background: rgba(10, 15, 35, .72);
-      border: 1px solid var(--bdr);
-      border-radius: 15px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform .2s, box-shadow .2s, border-color .2s;
-      position: relative;
-    }
-
-    .rc:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 14px 38px rgba(99, 102, 241, .22);
-      border-color: rgba(99, 102, 241, .4);
-    }
-
-    .rc img {
-      width: 100%;
-      height: 175px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .rc .ci {
-      padding: 13px 15px;
-    }
-
-    .rc .cn {
-      font-weight: 700;
-      font-size: .95rem;
-      margin-bottom: 5px;
-    }
-
-    .rc .ml {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .chip {
-      background: rgba(99, 102, 241, .12);
-      border: 1px solid rgba(99, 102, 241, .2);
-      color: var(--pl);
-      padding: 3px 9px;
-      border-radius: 20px;
-      font-size: .75rem;
-      font-weight: 600;
-    }
-
-    .vo {
-      position: absolute;
-      inset: 0;
-      height: 175px;
-      background: rgba(99, 102, 241, 0);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .25s;
-    }
-
-    .rc:hover .vo {
-      background: rgba(99, 102, 241, .22);
-    }
-
-    .vo span {
-      background: rgba(0, 0, 0, .72);
-      color: #fff;
-      padding: 7px 18px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: .88rem;
-      opacity: 0;
-      transform: scale(.85);
-      transition: opacity .25s, transform .25s;
-    }
-
-    .rc:hover .vo span {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    /* Modal */
-    #imod {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .92);
-      z-index: 10000;
-      overflow-y: auto;
-      padding: 60px 10px;
-    }
-
-    #imod.open {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    #imod .mw {
-      max-width: 90vw;
-      margin-bottom: 18px;
-    }
-
-    #imod .mw img {
-      max-width: 100%;
-      max-height: 72vh;
-      border-radius: 13px;
-      box-shadow: 0 18px 55px rgba(0, 0, 0, .6);
-    }
-
-    #imod .mi {
-      background: rgba(20, 30, 55, .96);
-      border: 1px solid var(--bdr);
-      border-radius: 15px;
-      padding: 16px 22px;
-      max-width: 90vw;
-      width: 400px;
-    }
-
-    #imod .mi .mn {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    #imod .cm {
-      position: fixed;
-      top: 16px;
-      right: 20px;
-      font-size: 1.4rem;
-      color: #fff;
-      cursor: pointer;
-      background: rgba(255, 255, 255, .12);
-      border: none;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .dlbtn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
-      color: #fff;
-      text-decoration: none;
-      padding: 9px 20px;
-      border-radius: 9px;
-      font-weight: 600;
-      font-size: .88rem;
-    }
+    .ph { text-align: center; margin-bottom: 32px; width: 100%; max-width: 940px; }
+    .ph h1 { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; background: linear-gradient(135deg, #22d3ee, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card { background: var(--card); backdrop-filter: blur(18px); border: 1px solid var(--bdr); border-radius: 20px; padding: 26px; width: 100%; max-width: 940px; box-shadow: 0 28px 56px rgba(0,0,0,.35); margin-bottom: 22px; }
+    .sbox { position: relative; margin-bottom: 14px; }
+    .sbox .si { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; }
+    .sbox input { width: 100%; background: var(--inp); border: 1.5px solid var(--bdr); border-radius: 13px; padding: 14px 16px 14px 48px; color: var(--txt); font-size: 1rem; outline: none; }
+    #rgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+    .rc { background: rgba(10, 15, 35, .72); border: 1px solid var(--bdr); border-radius: 15px; overflow: hidden; cursor: pointer; transition: transform .2s; }
+    .rc:hover { transform: translateY(-4px); border-color: var(--pl); }
+    .rc img { width: 100%; height: 175px; object-fit: cover; }
+    .rc .ci { padding: 13px 15px; }
+    .rc .cn { font-weight: 700; font-size: .95rem; margin-bottom: 5px; }
+    .chip { background: rgba(99, 102, 241, .12); color: var(--pl); padding: 3px 9px; border-radius: 20px; font-size: .75rem; font-weight: 600; margin-right: 5px; }
+    #imod { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .92); z-index: 10000; overflow-y: auto; padding: 60px 10px; flex-direction: column; align-items: center; }
+    #imod.open { display: flex; }
+    #imod .mw img { max-width: 100%; max-height: 72vh; border-radius: 13px; }
+    #imod .mi { background: var(--card); border: 1px solid var(--bdr); border-radius: 15px; padding: 16px 22px; width: 400px; max-width: 90vw; margin-top: 20px; }
+    .cm { position: fixed; top: 16px; right: 20px; font-size: 1.4rem; color: #fff; cursor: pointer; background: rgba(255, 255, 255, .1); border: none; border-radius: 50%; width: 40px; height: 40px; }
+    .dlbtn { display: inline-flex; align-items: center; gap: 7px; background: var(--primary); color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 9px; font-weight: 600; margin-top: 15px; }
   </style>
 </head>
-
 <body>
-  <div class="ph">
-    <h1>🔎 Search Tracking Photos</h1>
-    <p>Please enter your phone number to find your tracking photo.</p>
-  </div>
-
-  <div class="card">
-    <div class="sbox"><span class="si">🔍</span><input type="text" id="si"
-        placeholder="Enter phone number..." autocomplete="off" autofocus
-        oninput="doSearch()"></div>
-  </div>
-
-  <div class="card">
-    <div id="rgrid"></div>
-  </div>
-
-  <div id="imod">
-    <button class="cm" onclick="closeMod()">✕</button>
-    <div class="mw"><img id="mimg" src="" alt=""></div>
-    <div class="mi">
-      <div class="mn" id="mname"></div>
-      <div class="mm" id="mmeta"></div>
-      <a id="mdl" href="" download class="dlbtn">💾 Download Photo</a>
-    </div>
-  </div>
-
+  <div class="ph"><h1>🔎 Search Tracking Photos</h1><p>Enter phone number to find your parcel photo.</p></div>
+  <div class="card"><div class="sbox"><span class="si">🔍</span><input type="text" id="si" placeholder="Enter phone number..." oninput="doSearch()"></div></div>
+  <div class="card"><div id="rgrid"></div></div>
+  <div id="imod"><button class="cm" onclick="closeMod()">✕</button><div class="mw"><img id="mimg" src=""></div><div class="mi"><div class="mn" id="mname"></div><div class="mm" id="mmeta"></div><a id="mdl" href="" download class="dlbtn">💾 Download Photo</a></div></div>
   <script>
-    const OWNER = 'thecraftyriz';
-    const REPO = 'thecraftyriz';
-    const PATH = 'records.json';
-    const TOKEN_KEY = 'gh_tracking_token';
-
+    const OWNER = 'thecraftyriz'; const REPO = 'thecraftyriz'; const PATH = 'records.json';
     let allRecords = [];
-
     async function loadData() {
-      const ghp = localStorage.getItem(TOKEN_KEY);
-      if (!ghp) return;
       try {
-        const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`, {
-          headers: { Authorization: `token ${ghp}` }
-        });
-        const data = await res.json();
-        allRecords = JSON.parse(atob(data.content)).reverse();
-      } catch (e) {
-        console.error(e);
-      }
+        const res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${PATH}?v=${Date.now()}`);
+        allRecords = await res.json();
+        allRecords.reverse();
+      } catch (e) { console.error("Error loading data:", e); }
     }
-
     function doSearch() {
       const q = document.getElementById('si').value.trim();
       const g = document.getElementById('rgrid');
       if (!q) { g.innerHTML = ''; return; }
-
-      const results = allRecords.filter(r => r.phone.includes(q));
+      const results = allRecords.filter(r => r.phone && r.phone.includes(q));
       g.innerHTML = results.map(r => `
         <div class="rc" onclick='openMod(${JSON.stringify(r)})'>
           <img src="${r.photoUrl}" alt="">
-          <div class="vo"><span>View Photo</span></div>
           <div class="ci">
             <div class="cn">${r.name}</div>
-            <div class="ml">
-              <span class="chip ph">${r.phone}</span>
-              <span class="chip">📍 ${r.pincode}</span>
-            </div>
+            <div class="chip">${r.phone}</div><div class="chip">📍 ${r.pincode}</div>
           </div>
         </div>
       `).join('');
     }
-
     function openMod(r) {
       document.getElementById('mimg').src = r.photoUrl;
       document.getElementById('mname').textContent = r.name;
-      document.getElementById('mmeta').innerHTML = `
-        <span class="chip ph">${r.phone}</span>
-        <span class="chip">📍 ${r.pincode}</span>
-      `;
+      document.getElementById('mmeta').innerHTML = `<span class="chip">${r.phone}</span><span class="chip">📍 ${r.pincode}</span>`;
       document.getElementById('mdl').href = r.photoUrl;
       document.getElementById('imod').classList.add('open');
     }
-
-    function closeMod() {
-      document.getElementById('imod').classList.remove('open');
-    }
-
+    function closeMod() { document.getElementById('imod').classList.remove('open'); }
     loadData();
   </script>
 </body>
-
 </html>
