@@ -692,10 +692,13 @@
 
         function detectCourier(tn) {
             if (!tn) return '';
-            tn = tn.toUpperCase();
-            if (/^356\d{9}$/.test(tn) || /^\d{12}$/.test(tn)) return 'Delhivery';
-            if (/^[DWXUVB]\d{8,9}$/.test(tn)) return 'DTDC';
-            if (/^\d{9,10}$/.test(tn)) return 'Trackon';
+            tn = tn.trim().toUpperCase();
+            // Delhivery: 12-14 digits, starts with 19 or 356
+            if (/^(19|35)\d{10,12}$/.test(tn)) return 'Delhivery';
+            // DTDC: Starts with D, W, X, U, V, B followed by 9-11 digits
+            if (/^[DWXUVB]\d{9,11}$/.test(tn)) return 'DTDC';
+            // Trackon: 10-12 digits, often starts with 100
+            if (/^100\d{9}$/.test(tn) || /^\d{10,12}$/.test(tn)) return 'Trackon';
             return 'Courier';
         }
 
