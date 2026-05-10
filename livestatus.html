@@ -44,17 +44,18 @@
         .back-btn {
             color: var(--muted);
             text-decoration: none;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 15px;
+            font-size: 1.6rem;
+            padding: 8px 14px;
             border: 1px solid var(--bdr);
             border-radius: 8px;
             background: rgba(255,255,255,0.05);
             transition: all 0.2s;
+            line-height: 1;
         }
-        .back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
 
         #YQContainer {
             width: 100%;
@@ -89,9 +90,9 @@
 <body>
 
     <div class="header">
-        <a href="javascript:history.back()" class="back-btn">← Back to Search</a>
+        <a href="javascript:history.back()" class="back-btn">←</a>
         <h1>🚚 Live Tracking</h1>
-        <div style="width:100px;"></div>
+        <div style="width:50px;"></div> <!-- spacer -->
     </div>
 
     <div class="container">
@@ -149,7 +150,6 @@
 
                     const carrierCode = getCarrierCode(awb);
 
-                    // Auto track for all carriers (including Delhivery)
                     YQV5.trackSingle({
                         YQ_ContainerId: "YQContainer",
                         YQ_Height: 650,
