@@ -1,7 +1,147 @@
-<!-- Simple Track24 Widget -->
-<iframe 
-    src="https://track24.net/forms/widget/?num=TRACKING_NUMBER_HERE" 
-    width="100%" 
-    height="600" 
-    frameborder="0">
-</iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Tracking - Track24</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0a0f1e;
+            --card: rgba(20, 30, 55, .85);
+            --txt: #f1f5f9;
+            --muted: #94a3b8;
+            --bdr: rgba(255, 255, 255, .1);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, .15), transparent 60%);
+            color: var(--txt);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 950px;
+            margin-top: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+        .header h1 {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #818cf8, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .back-btn {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border: 1px solid var(--bdr);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.12);
+            color: white;
+        }
+        .info-card {
+            background: var(--card);
+            border: 1px solid var(--bdr);
+            padding: 18px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .info-card span { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
+        
+        #track24-frame {
+            width: 100%;
+            min-height: 680px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.45);
+            border: none;
+        }
+        .loading {
+            padding: 100px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="javascript:history.back()" class="back-btn">← Back to Search</a>
+        <h1>🚚 Live Package Tracking</h1>
+        <div style="width:100px;"></div>
+    </div>
+
+    <div class="container">
+        <div class="info-card">
+            Tracking Number: <span id="awb-display">Loading...</span><br>
+            <small id="carrier-info" style="color:#64748b; margin-top:6px; display:block;"></small>
+        </div>
+        
+        <div id="loading" class="loading">
+            ⌛ Loading Tracking Widget...
+        </div>
+        
+        <iframe id="track24-frame" 
+                src="about:blank" 
+                frameborder="0" 
+                allowfullscreen>
+        </iframe>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const awb = params.get('awb')?.trim();
+
+        if (!awb) {
+            document.querySelector('.info-card').innerHTML = `<strong style="color:#ef4444;">❌ No tracking number provided.</strong>`;
+            document.getElementById('loading').style.display = 'none';
+        } else {
+            document.getElementById('awb-display').textContent = awb;
+
+            // Optional: Show carrier hint
+            const upper = awb.toUpperCase();
+            let carrier = "Multiple Couriers";
+
+            if (upper.startsWith('D')) carrier = "DTDC";
+            else if (upper.startsWith('5006')) carrier = "Trackon";
+            else if (upper.startsWith('356') || upper.startsWith('19')) carrier = "Delhivery";
+            else if (upper.startsWith('B')) carrier = "Bluedart";
+
+            document.getElementById('carrier-info').textContent = `Detected Carrier: ${carrier}`;
+
+            // Load Track24 Widget
+            const frame = document.getElementById('track24-frame');
+            frame.src = `https://track24.net/forms/widget/?num=${encodeURIComponent(awb)}`;
+
+            // Hide loading text once iframe starts loading
+            frame.onload = () => {
+                document.getElementById('loading').style.display = 'none';
+            };
+        }
+    </script>
+</body>
+</html>
