@@ -959,9 +959,18 @@
         async function loadRecords() {
             const list = document.getElementById('rlist');
             list.innerHTML = '<div class="empty"><div class="ei">⏳</div><p>Loading from GitHub…</p></div>';
-            if (!cfg.token || !cfg.repo) { list.innerHTML = '<div class="empty"><div class="ei">⚙️</div><p>Configure GitHub first.</p></div>'; return; }
+            if (!cfg.repo) { list.innerHTML = '<div class="empty"><div class="ei">⚙️</div><p>Configure GitHub Repository first.</p></div>'; return; }
             try {
-                const { records } = await fetchRecordsJSON();
+                let records = [];
+                // If token exists, use API (for latest data), else use raw URL
+                if (cfg.token) {
+                    const { records: r } = await fetchRecordsJSON();
+                    records = r;
+                } else {
+                    const res = await fetch(`https://raw.githubusercontent.com/${cfg.repo}/${cfg.branch || 'main'}/records.json?v=${Date.now()}`);
+                    if (!res.ok) throw new Error("Could not load records publicly.");
+                    records = await res.json();
+                }
                 renderRecords(records);
             } catch (e) {
                 list.innerHTML = `<div class="empty"><div class="ei">❌</div><p>${e.message}</p></div>`;
