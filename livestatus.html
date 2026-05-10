@@ -86,7 +86,7 @@
     <div class="header">
         <a href="javascript:history.back()" class="back-btn">← Back to Search</a>
         <h1>🚚 Live Tracking</h1>
-        <div style="width:100px;"></div> <!-- spacer -->
+        <div style="width:100px;"></div>
     </div>
 
     <div class="container">
@@ -102,7 +102,6 @@
     </div>
 
     <script>
-        // Get AWB from URL
         const params = new URLSearchParams(window.location.search);
         const awb = params.get('awb');
 
@@ -111,21 +110,30 @@
             document.getElementById('YQContainer').style.display = 'none';
         } else {
             document.getElementById('awb-display').textContent = awb;
-            
-            // Wait for 17Track script to be ready
+
             function initTracking() {
-                if (typeof YQ511 !== 'undefined') {
-                    YQ511.trackSingle({
+                if (typeof YQV5 !== 'undefined') {
+                    // Clear the loading message
+                    document.getElementById('YQContainer').innerHTML = '';
+
+                    YQV5.trackSingle({
                         YQ_ContainerId: "YQContainer",
-                        YQ_Height: 500,
+                        YQ_Height: 600,        // You can adjust this
                         YQ_Lang: "en",
-                        YQ_Num: awb
+                        YQ_Num: awb,
+                        YQ_Fc: "0"             // 0 = auto detect carrier
                     });
                 } else {
-                    setTimeout(initTracking, 500);
+                    setTimeout(initTracking, 400);
                 }
             }
-            window.onload = initTracking;
+
+            // Start initialization
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initTracking);
+            } else {
+                initTracking();
+            }
         }
     </script>
 </body>
