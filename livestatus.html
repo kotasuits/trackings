@@ -56,7 +56,6 @@
             background: rgba(255,255,255,0.1);
             color: #fff;
         }
-
         #YQContainer {
             width: 100%;
             min-height: 650px;
@@ -74,7 +73,6 @@
             text-align: center;
         }
         .info-card span { color: var(--primary); font-weight: 700; }
-
         .delhivery-instruction {
             margin-top: 12px;
             padding: 12px 16px;
@@ -92,20 +90,20 @@
     <div class="header">
         <a href="javascript:history.back()" class="back-btn">←</a>
         <h1>🚚 Live Tracking</h1>
-        <div style="width:50px;"></div> <!-- spacer -->
+        <div style="width:50px;"></div>
     </div>
 
     <div class="container">
         <div class="info-card">
             Tracking Number: <span id="awb-display">Loading...</span>
             <div class="carrier-info" id="carrier-info"></div>
-            
+           
             <!-- Instruction Only for Delhivery -->
             <div class="delhivery-instruction" id="delhivery-msg">
                 Type <strong>1</strong> in Postcode box and Confirm to check live tracking
             </div>
         </div>
-        
+       
         <div id="YQContainer">
             <div style="padding:80px; text-align:center; color:#666;">
                 ⌛ Initializing Tracking Service...
@@ -126,20 +124,26 @@
             function getCarrierCode(trackingNum) {
                 const num = trackingNum.toUpperCase().trim();
 
+                // DTDC
                 if (num.startsWith('D')) {
                     document.getElementById('carrier-info').textContent = 'Carrier: DTDC';
                     return "100069";
                 }
-                if (num.startsWith('5006')) {
+
+                // Trackon - Multiple prefixes
+                if (num.startsWith('5006') || num.startsWith('1003')) {
                     document.getElementById('carrier-info').textContent = 'Carrier: Trackon';
                     return "100180";
                 }
+
+                // Delhivery
                 if (num.startsWith('356') || num.startsWith('19')) {
                     document.getElementById('carrier-info').textContent = 'Carrier: Delhivery';
                     document.getElementById('delhivery-msg').style.display = 'block';
                     return "100060";
                 }
 
+                // Default - Auto detect
                 document.getElementById('carrier-info').textContent = 'Carrier: Auto Detecting...';
                 return "0";
             }
@@ -147,7 +151,6 @@
             function initTracking() {
                 if (typeof YQV5 !== 'undefined') {
                     document.getElementById('YQContainer').innerHTML = '';
-
                     const carrierCode = getCarrierCode(awb);
 
                     YQV5.trackSingle({
