@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Search Tracking Photos</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="//www.17track.net/externalcall.js"></script>
   <style>
     :root {
       --primary: #6366f1;
@@ -395,13 +396,13 @@
 <body>
   <div class="ph">
     <h1>🔎 Search Tracking Photos</h1>
-    <p>Find delivery photos by customer name, pincode, or phone number.</p>
+    <p>Find your photo using the last 5 digits of your phone number.</p>
   </div>
 
   <!-- Search -->
   <div class="card">
     <div class="sbox"><span class="si">🔍</span><input type="text" id="si"
-        placeholder="Enter your phone number or pincode to find your tracking photo..." autocomplete="off" autofocus
+        placeholder="Enter last 5 digits of your phone number..." autocomplete="off" autofocus
         oninput="doSearch()"></div>
   </div>
 
@@ -414,7 +415,7 @@
       <div class="sb" id="init-st">
         <div class="si2">🔎</div>
         <h3>Start searching</h3>
-        <p>Type a name, pincode, or phone number above.</p>
+        <p>Type the last 5 digits of your phone number above.</p>
       </div>
       <div class="sb" id="empty-st" style="display:none;">
         <div class="si2">😕</div>
@@ -449,6 +450,12 @@
         <a href="https://trackon.in/" target="_blank" class="tlink trackon"><span>🚚</span> Trackon</a>
         <a href="https://www.delhivery.com/tracking" target="_blank" class="tlink delhivery"><span>📦</span> Delhivery</a>
       </div>
+
+      <div id="track-area" style="display:none; margin-top:15px; border-top:1px solid var(--bdr); padding-top:15px;">
+        <div id="YQContainer" style="width:100%; height:300px; border-radius:10px; overflow:hidden;"></div>
+      </div>
+      <button id="track-btn" class="dlbtn" style="width:100%; justify-content:center; margin-top:10px; background:linear-gradient(135deg, #10b981, #059669); display:none;" onclick="startTrack()">🚚 Track Live Status</button>
+
       <a id="mdl" class="dlbtn" style="width:100%; justify-content:center; margin-top:15px;" download="tracking_photo.jpg">⬇️ Download Photo</a>
     </div>
   </div>
@@ -510,11 +517,11 @@
       const q = raw.toLowerCase();
       if (!allRecords.length) { showState('norec-st'); return; }
 
-      // Require at least 4 characters to prevent showing too many/all results
-      if (q.length < 4) { showState('init-st'); return; }
+      // Require exactly/at least 5 characters for security
+      if (q.length < 5) { showState('init-st'); return; }
 
       const matched = allRecords.filter(r =>
-        String(r.pincode || '').toLowerCase().includes(q) || String(r.phone || '').toLowerCase().includes(q)
+        String(r.phone || '').endsWith(q)
       );
 
       ['init-st', 'empty-st', 'norec-st', 'load-st'].forEach(s => document.getElementById(s).style.display = 'none');
@@ -525,10 +532,11 @@
       document.getElementById('rcnt').textContent = matched.length;
       document.getElementById('rbadge').textContent = matched.length;
 
-      document.getElementById('rgrid').innerHTML = matched.map(r => `
+      document.getElementById('rgrid').innerHTML = matched.map(r => {
+        return `
     <div class="rc" onclick="openMod('${r.id}')">
       <div class="vo"><span>🔍 View Photo</span></div>
-      <img src="${r.photoUrl}" alt="${r.name}" loading="lazy">
+      <img src="${r.photoUrl}" alt="parcel photo" loading="lazy">
       <div class="ci">
         <div class="cn">👤 ${hl(r.name, q)}</div>
         <div class="ml">
@@ -537,20 +545,54 @@
           <span class="chip dt">🕐 ${fmtDate(r.uploadedAt)}</span>
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+      }).join('');
     }
+
+    let currentTrackingId = '';
 
     function openMod(id) {
       const r = allRecords.find(x => x.id === id);
       if (!r) return;
       document.getElementById('mimg').src = r.photoUrl;
       document.getElementById('mname').textContent = `👤 ${r.name}`;
-      document.getElementById('mmeta').innerHTML = `<span class="chip">📍 ${r.pincode}</span><span class="chip ph">📞 ${r.phone}</span><span class="chip dt">🕐 ${fmtDate(r.uploadedAt)}</span>`;
+      
+      let meta = `<span class="chip">📍 ${r.pincode}</span><span class="chip ph">📞 ${r.phone}</span><span class="chip dt">🕐 ${fmtDate(r.uploadedAt)}</span>`;
+      if (r.courier && r.trackingId) {
+        meta += `<br><span style="color:var(--pl);font-weight:600;margin-top:8px;display:inline-block;">🚚 ${r.courier}: ${r.trackingId}</span>`;
+        currentTrackingId = r.trackingId;
+        document.getElementById('track-btn').style.display = 'flex';
+      } else {
+        document.getElementById('track-btn').style.display = 'none';
+        currentTrackingId = '';
+      }
+      document.getElementById('mmeta').innerHTML = meta;
+      
       const dl = document.getElementById('mdl');
-      dl.href = r.photoUrl; dl.download = `tracking_${r.name}_${r.pincode}.jpg`;
+      dl.href = r.photoUrl; dl.download = `tracking_photo.jpg`;
+
+      document.getElementById('track-area').style.display = 'none';
+      document.getElementById('YQContainer').innerHTML = '';
+      
       document.getElementById('imod').classList.add('open');
     }
-    
+
+    function startTrack() {
+      if (!currentTrackingId || typeof YQ511 === 'undefined') {
+        alert("Tracking service is loading or unavailable. Please try again.");
+        return;
+      }
+      document.getElementById('track-area').style.display = 'block';
+      document.getElementById('track-btn').style.display = 'none';
+      
+      YQ511.trackSingle({
+        YQ_ContainerId: "YQContainer",
+        YQ_Height: 300,
+        YQ_Lang: "en",
+        YQ_Num: currentTrackingId
+      });
+    }
+
     function closeMod() { document.getElementById('imod').classList.remove('open'); document.getElementById('mimg').src = ''; }
     function openHelp() { document.getElementById('hmod').classList.add('open'); }
     function closeHelp() { document.getElementById('hmod').classList.remove('open'); }
