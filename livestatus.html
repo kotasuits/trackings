@@ -26,11 +26,7 @@
             flex-direction: column;
             align-items: center;
         }
-        .container {
-            width: 100%;
-            max-width: 800px;
-            margin-top: 20px;
-        }
+        .container { width: 100%; max-width: 800px; margin-top: 20px; }
         .header {
             display: flex;
             align-items: center;
@@ -64,7 +60,7 @@
         }
         #YQContainer {
             width: 100%;
-            min-height: 500px;
+            min-height: 600px;
             border-radius: 15px;
             overflow: hidden;
             background: white;
@@ -91,11 +87,12 @@
 
     <div class="container">
         <div class="info-card">
-            Tracking Number: <span id="awb-display">Loading...</span>
+            Tracking Number: <span id="awb-display">Loading...</span><br>
+            <small id="carrier-info" style="color:#64748b;"></small>
         </div>
         
         <div id="YQContainer">
-            <div style="padding:50px; text-align:center; color:#666;">
+            <div style="padding:80px 20px; text-align:center; color:#666;">
                 ⌛ Initializing Tracking Service...
             </div>
         </div>
@@ -103,7 +100,7 @@
 
     <script>
         const params = new URLSearchParams(window.location.search);
-        const awb = params.get('awb');
+        const awb = params.get('awb')?.trim();
 
         if (!awb) {
             document.querySelector('.info-card').innerHTML = "❌ No tracking number provided.";
@@ -111,24 +108,42 @@
         } else {
             document.getElementById('awb-display').textContent = awb;
 
+            // ================== Carrier Detection ==================
+            let carrierCode = "0"; // 0 = auto detect (default)
+            const upperAwb = awb.toUpperCase();
+
+            if (upperAwb.startsWith('D')) {
+                carrierCode = "100069";     // DTDC
+                document.getElementById('carrier-info').textContent = "Carrier: DTDC";
+            } 
+            else if (upperAwb.startsWith('5006')) {
+                carrierCode = "100180";     // Trackon
+                document.getElementById('carrier-info').textContent = "Carrier: Trackon";
+            } 
+            else if (upperAwb.startsWith('356') || upperAwb.startsWith('19')) {
+                carrierCode = "100060";     // Delhivery
+                document.getElementById('carrier-info').textContent = "Carrier: Delhivery";
+            } else {
+                document.getElementById('carrier-info').textContent = "Carrier: Auto Detection";
+            }
+
+            // ================== Initialize 17Track ==================
             function initTracking() {
                 if (typeof YQV5 !== 'undefined') {
-                    // Clear the loading message
                     document.getElementById('YQContainer').innerHTML = '';
 
                     YQV5.trackSingle({
                         YQ_ContainerId: "YQContainer",
-                        YQ_Height: 600,        // You can adjust this
+                        YQ_Height: 600,
                         YQ_Lang: "en",
                         YQ_Num: awb,
-                        YQ_Fc: "0"             // 0 = auto detect carrier
+                        YQ_Fc: carrierCode   // Specific carrier or 0 for auto
                     });
                 } else {
                     setTimeout(initTracking, 400);
                 }
             }
 
-            // Start initialization
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initTracking);
             } else {
