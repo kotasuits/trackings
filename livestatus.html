@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Tracking - Track24</title>
+    <title>Live Tracking</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -12,7 +12,6 @@
             --card: rgba(20, 30, 55, .85);
             --txt: #f1f5f9;
             --muted: #94a3b8;
-            --bdr: rgba(255, 255, 255, .1);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
         body {
@@ -51,7 +50,7 @@
             align-items: center;
             gap: 6px;
             padding: 9px 18px;
-            border: 1px solid var(--bdr);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 10px;
             background: rgba(255,255,255,0.05);
             transition: all 0.3s;
@@ -62,25 +61,27 @@
         }
         .info-card {
             background: var(--card);
-            border: 1px solid var(--bdr);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 18px;
             border-radius: 14px;
             margin-bottom: 25px;
             text-align: center;
         }
-        .info-card span { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
-        
+        .info-card span { 
+            color: var(--primary); 
+            font-weight: 700; 
+            font-size: 1.15rem; 
+        }
         #track24-frame {
             width: 100%;
             min-height: 680px;
             border-radius: 16px;
-            overflow: hidden;
             background: white;
             box-shadow: 0 25px 60px rgba(0,0,0,0.45);
             border: none;
         }
         .loading {
-            padding: 100px 20px;
+            padding: 120px 20px;
             text-align: center;
             color: #64748b;
             font-size: 1.1rem;
@@ -92,37 +93,36 @@
     <div class="header">
         <a href="javascript:history.back()" class="back-btn">← Back to Search</a>
         <h1>🚚 Live Package Tracking</h1>
-        <div style="width:100px;"></div>
+        <div></div>
     </div>
 
     <div class="container">
         <div class="info-card">
-            Tracking Number: <span id="awb-display">Loading...</span><br>
+            Tracking Number: <span id="awb-display">-</span><br>
             <small id="carrier-info" style="color:#64748b; margin-top:6px; display:block;"></small>
         </div>
         
         <div id="loading" class="loading">
-            ⌛ Loading Tracking Widget...
+            ⌛ Loading Track24 Widget...
         </div>
         
-        <iframe id="track24-frame" 
-                src="about:blank" 
-                frameborder="0" 
-                allowfullscreen>
-        </iframe>
+        <iframe id="track24-frame" src="about:blank" frameborder="0" allowfullscreen></iframe>
     </div>
 
     <script>
+        // Get AWB from URL parameter ?awb=xxxxxxxx
         const params = new URLSearchParams(window.location.search);
         const awb = params.get('awb')?.trim();
 
         if (!awb) {
-            document.querySelector('.info-card').innerHTML = `<strong style="color:#ef4444;">❌ No tracking number provided.</strong>`;
+            document.querySelector('.info-card').innerHTML = 
+                `<strong style="color:#ef4444;">❌ No tracking number found in URL.<br><br>Use: ?awb=YOURTRACKINGNUMBER</strong>`;
             document.getElementById('loading').style.display = 'none';
         } else {
+            // Show tracking number
             document.getElementById('awb-display').textContent = awb;
 
-            // Optional: Show carrier hint
+            // Carrier hint
             const upper = awb.toUpperCase();
             let carrier = "Multiple Couriers";
 
@@ -131,13 +131,13 @@
             else if (upper.startsWith('356') || upper.startsWith('19')) carrier = "Delhivery";
             else if (upper.startsWith('B')) carrier = "Bluedart";
 
-            document.getElementById('carrier-info').textContent = `Detected Carrier: ${carrier}`;
+            document.getElementById('carrier-info').textContent = `Carrier: ${carrier}`;
 
-            // Load Track24 Widget
+            // Load Track24 Widget with tracking number
             const frame = document.getElementById('track24-frame');
             frame.src = `https://track24.net/forms/widget/?num=${encodeURIComponent(awb)}`;
 
-            // Hide loading text once iframe starts loading
+            // Hide loading when iframe loads
             frame.onload = () => {
                 document.getElementById('loading').style.display = 'none';
             };
