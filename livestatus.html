@@ -52,8 +52,10 @@
             transition: all 0.2s;
             line-height: 1;
         }
-        .back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-
+        .back-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
         #YQContainer {
             width: 100%;
             min-height: 650px;
@@ -61,9 +63,7 @@
             overflow: hidden;
             background: white;
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            position: relative;
         }
-
         .info-card {
             background: var(--card);
             border: 1px solid var(--bdr);
@@ -73,7 +73,6 @@
             text-align: center;
         }
         .info-card span { color: var(--primary); font-weight: 700; }
-
         .delhivery-instruction {
             margin-top: 12px;
             padding: 12px 16px;
@@ -84,9 +83,6 @@
             font-weight: 500;
             display: none;
         }
-
-        /* Simple Ad Blocker Styles */
-        .ad-blocked { display: none !important; }
     </style>
 </head>
 <body>
@@ -102,6 +98,7 @@
             Tracking Number: <span id="awb-display">Loading...</span>
             <div class="carrier-info" id="carrier-info"></div>
            
+            <!-- Instruction Only for Delhivery -->
             <div class="delhivery-instruction" id="delhivery-msg">
                 Type <strong>1</strong> in Postcode box and Confirm to check live tracking
             </div>
@@ -127,43 +124,28 @@
             function getCarrierCode(trackingNum) {
                 const num = trackingNum.toUpperCase().trim();
 
+                // DTDC
                 if (num.startsWith('D')) {
                     document.getElementById('carrier-info').textContent = 'Carrier: DTDC';
                     return "100069";
                 }
+
+                // Trackon - Multiple prefixes
                 if (num.startsWith('5006') || num.startsWith('1003')) {
                     document.getElementById('carrier-info').textContent = 'Carrier: Trackon';
                     return "100180";
                 }
+
+                // Delhivery
                 if (num.startsWith('356') || num.startsWith('19')) {
                     document.getElementById('carrier-info').textContent = 'Carrier: Delhivery';
                     document.getElementById('delhivery-msg').style.display = 'block';
                     return "100060";
                 }
 
+                // Default - Auto detect
                 document.getElementById('carrier-info').textContent = 'Carrier: Auto Detecting...';
                 return "0";
-            }
-
-            // ============== Simple Ad Blocker (Brave Style) ==============
-            function activateAdBlocker() {
-                const adSelectors = [
-                    'iframe[src*="ads"]', 'iframe[src*="google"]', 'iframe[src*="doubleclick"]',
-                    '.ad', '.ads', '.advert', '.banner', '.sponsor', '[id*="ad"]', '[class*="ad"]',
-                    'ins.adsbygoogle', '.yq-ad', '.promo', 'div[style*="position: fixed"]'
-                ];
-
-                const observer = new MutationObserver(() => {
-                    adSelectors.forEach(selector => {
-                        document.querySelectorAll(selector).forEach(el => {
-                            el.style.display = 'none';
-                            el.classList.add('ad-blocked');
-                            if (el.parentElement) el.parentElement.style.display = 'none';
-                        });
-                    });
-                });
-
-                observer.observe(document.getElementById('YQContainer'), { childList: true, subtree: true });
             }
 
             function initTracking() {
@@ -178,9 +160,6 @@
                         YQ_Num: awb,
                         YQ_Fc: carrierCode
                     });
-
-                    // Activate ad blocker after widget loads
-                    setTimeout(activateAdBlocker, 1500);
                 } else {
                     setTimeout(initTracking, 400);
                 }
